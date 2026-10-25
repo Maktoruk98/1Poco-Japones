@@ -29,10 +29,25 @@ python3 -m http.server 8000
 
 y abre http://localhost:8000.
 
+## Cuentas con Google (opcional)
+
+Con Firebase configurado aparece un botón **Entrar**: cada persona inicia sesión con
+su cuenta de Google y tiene sus propios logros, guardados en la nube y disponibles en
+cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
+
+1. En https://console.firebase.google.com crea un proyecto (Analytics no hace falta).
+2. **Authentication → Comenzar → Google**: habilítalo y guarda.
+3. **Authentication → Configuración → Dominios autorizados**: añade `maktoruk98.github.io`.
+4. **Firestore Database → Crear base de datos** (modo producción, ubicación en Europa).
+   En **Reglas**, pega el contenido de `firestore.rules` y publica.
+5. **Configuración del proyecto → Tus apps → Web (`</>`)**: registra la app y copia el
+   objeto `firebaseConfig` en `firebase-config.js` (no es secreto).
+
 ## Estructura
 
 - `index.html` — esqueleto y navegación
 - `styles.css` — estilos (modo claro y oscuro)
 - `data.js` — contenido: kana, vocabulario y frases
 - `app.js` — lógica: rutas, cuestionarios, progreso
+- `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube
 - `sw.js`, `manifest.webmanifest`, `icon.svg` — soporte PWA/offline

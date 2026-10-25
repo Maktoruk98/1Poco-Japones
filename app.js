@@ -1,28 +1,47 @@
 // Un poco más japonés — lógica de la app (sin dependencias).
+// La cuenta de Google y la sincronización en la nube viven en cloud.js.
 
 const DAILY_GOAL = 10;
 const MAX_BOX = 4;
 const BOX_WEIGHT = [8, 4, 2, 1, 0.5]; // lo que fallas aparece más a menudo
-const STORE_KEY = "upmj:v1";
+const STORE_BASE = "upmj:v1"; // progreso sin sesión; con sesión: upmj:v1:<uid>
 const GOAL_XP = 20;
 const CUSTOM_XP = 5;
 
 // ---------- Estado ----------
 
-function loadState() {
+let storeKey = STORE_BASE;
+
+function readStored(key) {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORE_KEY));
-    if (saved) return { ...loadStateDefaults(), ...saved };
-  } catch {}
-  return loadStateDefaults();
+    return JSON.parse(localStorage.getItem(key));
+  } catch {
+    return null;
+  }
+}
+
+function loadState() {
+  return { ...loadStateDefaults(), ...readStored(storeKey) };
 }
 
 const state = loadState();
 
-function save() {
+function persistLocal() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    localStorage.setItem(storeKey, JSON.stringify(state));
   } catch {}
+}
+
+function save() {
+  state.updatedAt = Date.now();
+  persistLocal();
+  if (typeof cloudQueueSave === "function") cloudQueueSave();
+}
+
+// Cambia el estado en memoria por otro (al entrar o salir de una cuenta).
+function replaceState(next) {
+  for (const k of Object.keys(state)) delete state[k];
+  Object.assign(state, loadStateDefaults(), next);
 }
 
 function dateKey(d = new Date()) {
@@ -405,6 +424,7 @@ function renderProgreso() {
   const { correct, total } = state.stats;
 
   view.innerHTML = `
+    ${typeof accountCard === "function" ? accountCard() : ""}
     <section class="card">
       <h2>Resumen</h2>
       <p>🎌 Nivel <b>${levelFor(totalXp()).level}</b> · ${levelFor(totalXp()).jp} (${esc(levelFor(totalXp()).es)}) · ${totalXp()} pts</p>
@@ -422,7 +442,7 @@ function renderProgreso() {
 
   document.getElementById("reset").addEventListener("click", () => {
     if (!confirm("¿Seguro que quieres borrar todo tu progreso?")) return;
-    Object.assign(state, loadStateDefaults());
+    replaceState({});
     save();
     renderStreak();
     renderProgreso();
@@ -430,7 +450,7 @@ function renderProgreso() {
 }
 
 function loadStateDefaults() {
-  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [] };
+  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], updatedAt: 0 };
 }
 
 // ---------- Navegación ----------

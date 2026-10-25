@@ -12,7 +12,10 @@
 <body>
   <header class="top">
     <h1>Un poco más <span class="jp">japonés</span></h1>
-    <div class="streak" id="streak" title="Racha de días">🔥 0</div>
+    <div class="row">
+      <div class="streak" id="streak" title="Racha de días">🔥 0</div>
+      <button id="account" class="account" hidden></button>
+    </div>
   </header>
 
   <main id="view"></main>
@@ -25,6 +28,8 @@
   </nav>
 
   <script src="data.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="app.js"></script>
+  <script src="cloud.js"></script>
 </body>
 </html>
