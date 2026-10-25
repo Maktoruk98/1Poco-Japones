@@ -19,7 +19,11 @@ El progreso se guarda en el navegador y la app funciona sin conexión (PWA insta
 
 ## Cómo usarla
 
-No necesita compilación ni dependencias. Sirve la carpeta con cualquier servidor estático:
+👉 **Online:** https://maktoruk98.github.io/1Poco-Japones/ (desde el móvil, «Añadir a pantalla de inicio»).
+
+En local
+
+no necesita compilación ni dependencias: sirve la carpeta con cualquier servidor estático:
 
 ```sh
 python3 -m http.server 8000
