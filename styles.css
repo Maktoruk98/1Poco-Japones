@@ -118,3 +118,83 @@ button:hover { border-color: var(--muted); }
 }
 .tabs a span { display: block; font-size: 1.3rem; }
 .tabs a.on { color: var(--accent); }
+
+/* ---------- Nivel y momentos japoneses ---------- */
+
+.level { text-align: center; }
+.level .big { color: var(--accent); }
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  list-style-position: inside;
+}
+details.card summary { border-top: 0; padding: 0; }
+details.about p { margin: 12px 0 0; line-height: 1.5; }
+.hint { margin: 0 0 8px; font-size: .9rem; }
+.badge {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 99px;
+  font-size: .75rem;
+  padding: 1px 8px;
+  margin-left: 4px;
+}
+
+.moment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 8px;
+}
+.moment .check {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+.moment .txt { flex: 1; }
+.moment small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; }
+.moment .xp { flex: none; font-weight: 700; color: var(--muted); }
+.moment.done { background: var(--ok-bg); border-color: var(--ok); }
+.moment.done .check { background: var(--ok); border-color: var(--ok); color: #fff; }
+.moment.done .xp { color: var(--ok); }
+
+.custom { margin-top: 12px; flex-wrap: nowrap; }
+.custom input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+}
+.customs { margin: 12px 0 0; padding-left: 4px; list-style: none; }
+.customs li { margin-bottom: 4px; }
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 20px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: 12px;
+  max-width: calc(100% - 32px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  z-index: 10;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }

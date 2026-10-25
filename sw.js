@@ -1,5 +1,6 @@
-// Cachea los archivos estáticos para que la app funcione sin conexión.
-const CACHE = "upmj-v1";
+// Primero intenta la red (para recibir siempre la última versión) y,
+// si no hay conexión, sirve la copia guardada.
+const CACHE = "upmj-v2";
 const FILES = ["./", "index.html", "styles.css", "data.js", "app.js", "icon.svg", "manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {
@@ -15,5 +16,14 @@ self.addEventListener("activate", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
-  e.respondWith(caches.match(e.request).then((hit) => hit || fetch(e.request)));
+  if (e.request.method !== "GET") return;
+  e.respondWith(
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
+  );
 });

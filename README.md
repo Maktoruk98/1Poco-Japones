@@ -5,7 +5,11 @@ Una app para aprender **un poco** de japonés cada día. Sin prisas, sin sesione
 
 ## Qué incluye
 
-- **Hoy**: palabra y frase del día (con audio), meta diaria y racha 🔥.
+- **Hoy**: tu nivel (de 観光客 «turista» a 日本の心 «corazón japonés») y los
+  **momentos japoneses**: más de 30 hábitos y pequeños placeres que echa de menos quien
+  vuelve de Japón (el bus puntual, guardarte la basura, decir いただきます…). Cada uno
+  suma puntos una vez al día, y puedes añadir los tuyos. Además: palabra y frase del día
+  (con audio), meta diaria de práctica y racha 🔥.
 - **Kana**: práctica de hiragana, katakana o ambos.
 - **Palabras**: vocabulario básico en las dos direcciones (japonés ⇄ español).
 - **Progreso**: qué kana y palabras dominas.
