@@ -352,7 +352,7 @@ details.about p { margin: 12px 0 0; line-height: 1.5; }
 @keyframes lr-pop { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
 .level-next { font-size: .85rem; margin-top: -6px; }
 
-/* ---------- Portada (inicio de sesión y carga) ---------- */
+/* ---------- Portada: intro, inicio de sesión y carga ---------- */
 
 .cover {
   position: fixed;
@@ -364,11 +364,19 @@ details.about p { margin: 12px 0 0; line-height: 1.5; }
   transition: opacity .45s, transform .45s;
   --ink: #1d1b19;
   --muted: #7d746a;
-  --card: #f6f2ea;
+  --card: #faf7f1;
 }
 .cover.leaving { opacity: 0; transform: scale(1.03); pointer-events: none; }
 body.covered { overflow: hidden; }
+
+/* Fondo: Fuji al amanecer, fijo y anclado abajo */
+.fuji { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.fuji-sky { transition: opacity 2.6s ease; }
+.fuji-land { transform: translateY(46px); transition: transform 2.8s cubic-bezier(.2, .7, .2, 1), opacity 2.4s ease; }
+
 .ac {
+  position: relative;
+  z-index: 1;
   min-height: 100%;
   max-width: 440px;
   margin: 0 auto;
@@ -376,17 +384,25 @@ body.covered { overflow: hidden; }
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: calc(48px + env(safe-area-inset-top)) 32px calc(36px + env(safe-area-inset-bottom));
+  padding: calc(44px + env(safe-area-inset-top)) 30px calc(32px + env(safe-area-inset-bottom));
   font-family: "Zen Kaku Gothic New", system-ui, sans-serif;
 }
 .ac-kicker { font-size: 11px; letter-spacing: .32em; color: #7d746a; }
 .ac-kicker b { color: var(--loop); font-weight: 500; letter-spacing: .1em; }
-.ac-ring { width: 100%; max-width: 330px; margin-top: 30px; }
-.ac-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; margin: 28px 0 0; animation: ac-rise .8s .6s ease-out both; }
-.ac-title.small { font-size: 22px; }
-.ac-rule { width: 28px; height: 1px; background: var(--loop); margin: 20px auto 0; }
-.ac p { color: #7d746a; margin: 10px 0 0; font-size: 14px; line-height: 1.6; animation: ac-rise .8s .75s ease-out both; }
-.ac-action { margin-top: auto; padding-top: 28px; width: 100%; display: grid; gap: 10px; justify-items: center; }
+.ac-ring { width: 100%; max-width: 310px; margin-top: 24px; }
+.ac-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; margin: 26px 0 0; animation: ac-rise .8s .6s ease-out both; }
+.ac-welcome { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; letter-spacing: .08em; margin: 18px 0 0; animation: ac-rise .8s .5s ease-out both; }
+.ac-welcome small { display: block; font-family: "Zen Kaku Gothic New", system-ui, sans-serif; font-size: 11px; letter-spacing: .3em; color: #7d746a; margin-top: 2px; }
+.ac-rule { width: 28px; height: 1px; background: var(--loop); margin: 16px auto 0; }
+.ac-sub { color: #5e564e; margin: 8px 0 0; font-size: 14px; line-height: 1.6; animation: ac-rise .8s .7s ease-out both; }
+.ac-trip { color: #5e564e; margin: 14px 0 0; font-size: 13px; animation: ac-rise .8s .9s ease-out both; }
+.ac-trip b { font-family: "Shippori Mincho", serif; font-weight: 600; color: #1d1b19; }
+.ac-proverb { margin-top: 18px; padding: 10px 16px; border-top: 1px solid rgba(29, 27, 25, .12); border-bottom: 1px solid rgba(29, 27, 25, .12); animation: ac-rise .8s 1.1s ease-out both; }
+.ac-proverb b { display: block; font-family: "Shippori Mincho", serif; font-weight: 600; font-size: 19px; letter-spacing: .12em; }
+.ac-proverb span { font-size: 12px; color: #5e564e; }
+.ac-action { margin-top: auto; padding-top: 26px; width: 100%; display: grid; gap: 10px; justify-items: center; }
+.ac-depart { margin: 0; font-size: 12px; letter-spacing: .14em; color: #7d746a; animation: ac-breathe 1.6s ease-in-out infinite; }
+.ac-depart b { font-family: "Shippori Mincho", serif; font-weight: 600; letter-spacing: .2em; color: #1d1b19; margin-right: 6px; }
 .ac-google, .ac-plain {
   display: flex;
   align-items: center;
@@ -402,11 +418,50 @@ body.covered { overflow: hidden; }
   font: 500 16px "Zen Kaku Gothic New", system-ui, sans-serif;
   animation: ac-rise .8s .9s ease-out both;
 }
-.ac-plain { background: transparent; color: #1d1b19; border: 1px solid #d3cbbd; }
+.ac-plain { background: rgba(255, 255, 255, .6); color: #1d1b19; border: 1px solid #d3cbbd; }
 .ac-google svg { width: 20px; height: 20px; background: #fff; border-radius: 50%; padding: 2px; box-sizing: content-box; }
-.ac-loading { font-size: 12px !important; letter-spacing: .3em; animation: ac-breathe 1.4s ease-in-out infinite !important; }
+/* Al llegar desde la intro, el título ya está en su sitio: lo demás aparece con un fundido suave */
+.ac.still .ac-title { animation: none; }
+.ac.still .ac-sub, .ac.still .ac-rule, .ac.still .ac-google, .ac.still .ac-plain, .ac.still .ac-depart, .ac.still .ac-kicker { animation: ac-fadein .7s ease-out both; }
+.ac.still .ac-depart { animation: ac-fadein .7s ease-out both, ac-breathe 1.6s ease-in-out .7s infinite; }
 @keyframes ac-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@keyframes ac-breathe { 50% { opacity: .35; } }
+@keyframes ac-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ac-breathe { 50% { opacity: .4; } }
+
+/* ---------- Intro (12 s): las clases s-* se van añadiendo a #cover ---------- */
+
+.intro { position: relative; z-index: 1; min-height: 100%; }
+.intro-skip {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 3;
+  font: 500 13px "Zen Kaku Gothic New", system-ui, sans-serif;
+  color: #5e564e;
+  background: rgba(255, 255, 255, .55);
+  border: 1px solid rgba(29, 27, 25, .12);
+  border-radius: 999px;
+  padding: 6px 14px;
+  backdrop-filter: blur(4px);
+}
+.intro-skip:focus-visible { outline: 2px solid var(--loop); outline-offset: 2px; }
+.cover.intro-mode .fuji-sky { opacity: 0; }
+.cover.intro-mode .fuji-land { opacity: 0; transform: translateY(170px); }
+.cover.s-land .fuji-sky { opacity: 1; }
+.cover.s-land .fuji-land { opacity: 1; transform: translateY(46px); }
+.intro-late { opacity: 0; transition: opacity 1s; }
+.cover.s-title .intro-late { opacity: 1; }
+.intro-sun { fill: var(--loop); opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.3); transition: opacity 1.2s ease, transform 1.4s cubic-bezier(.2, .7, .2, 1); }
+.cover.s-sun .intro-sun { opacity: 1; transform: scale(1); }
+.cover.s-ring .intro-sun { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.44); transition: transform 1s cubic-bezier(.5, 0, .3, 1), opacity .35s ease .85s; }
+.intro-lines { position: relative; width: 100%; min-height: 150px; margin-top: 26px; }
+.intro-line, .intro-title { position: absolute; left: 0; right: 0; top: 0; margin: 0; opacity: 0; transform: translateY(10px); transition: opacity .9s ease, transform .9s ease; }
+.intro-line { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 21px; line-height: 1.55; color: #1d1b19; }
+.intro-line b { display: block; font-weight: 600; font-size: 36px; letter-spacing: .14em; }
+.intro-line span { display: block; font-family: "Zen Kaku Gothic New", system-ui, sans-serif; font-size: 12px; letter-spacing: .2em; color: #7d746a; margin-top: 4px; }
+.intro-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; }
+.cover.s-line-1 [data-line="1"], .cover.s-line-2 [data-line="2"], .cover.s-line-3 [data-line="3"], .cover.s-title .intro-title { opacity: 1; transform: none; }
+.cover.s-line-1-out [data-line="1"], .cover.s-line-2-out [data-line="2"], .cover.s-line-3-out [data-line="3"] { opacity: 0; transform: translateY(-8px); }
 
 /* ---------- Elegir la palabra de la nueva estación ---------- */
 
@@ -449,5 +504,5 @@ body.covered { overflow: hidden; }
 .line-pending { border-color: var(--loop); }
 
 @media (prefers-reduced-motion: reduce) {
-  .lr-ring.draw, .fade, .pop, .lr-beat, .lr-halo, .ac-title, .ac p, .ac-google, .ac-plain, .ac-loading { animation: none !important; opacity: 1; stroke-dashoffset: 0; }
+  .lr-ring.draw, .fade, .pop, .lr-beat, .lr-halo, .ac-title, .ac-welcome, .ac-sub, .ac-trip, .ac-proverb, .ac-depart, .ac-google, .ac-plain { animation: none !important; opacity: 1; stroke-dashoffset: 0; }
 }

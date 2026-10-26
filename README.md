@@ -35,8 +35,10 @@ y abre http://localhost:8000.
 
 ## Portada y cuentas con Google
 
-Al abrir la app se dibuja el anillo de la Loop Line: sin sesión, con Bentenchō y el botón
-de Google; con sesión, como pantalla de carga en la que aparecen tus estaciones. Con Firebase configurado, cada persona inicia sesión con
+Sin sesión, la app abre con una intro de 12 segundos (se puede saltar): un sol sobre el
+Fuji al amanecer que se convierte en el anillo de la Loop Line, y después el inicio de sesión
+con Google. Con sesión, la pantalla de carga muestra tus estaciones en el anillo,
+«おかえりなさい», la siguiente estación y un proverbio japonés distinto cada día. Con Firebase configurado, cada persona inicia sesión con
 su cuenta de Google y tiene sus propios logros, guardados en la nube y disponibles en
 cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
 

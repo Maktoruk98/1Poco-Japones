@@ -483,7 +483,8 @@ function route() {
 window.addEventListener("hashchange", route);
 renderStreak();
 route();
-renderCover("loading");
+// Sin sesión guardada: intro de 12 s antes del inicio de sesión. Con sesión: pantalla de carga.
+if (storeKey !== STORE_BASE || !playIntro()) renderCover("loading");
 if (!FIREBASE_CONFIG) hideCover();
 
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

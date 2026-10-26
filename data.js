@@ -182,3 +182,21 @@ const LEVELS = [
   [3700, "将軍", "shōgun", "Shōgun"],
   [4200, "日本の心", "nihon no kokoro", "Corazón japonés"],
 ].map(([xp, jp, romaji, es], i) => ({ level: i + 1, xp, jp, romaji, es }));
+
+// Proverbios japoneses (ことわざ) para la pantalla de carga: uno distinto cada día.
+const PROVERBS = [
+  ["継続は力なり", "keizoku wa chikara nari", "La constancia es poder."],
+  ["塵も積もれば山となる", "chiri mo tsumoreba yama to naru", "Hasta el polvo, acumulado, se vuelve montaña."],
+  ["千里の道も一歩から", "senri no michi mo ippo kara", "Un viaje de mil leguas empieza con un paso."],
+  ["七転び八起き", "nana korobi ya oki", "Cae siete veces, levántate ocho."],
+  ["一期一会", "ichigo ichie", "Cada encuentro es único e irrepetible."],
+  ["石の上にも三年", "ishi no ue ni mo sannen", "Tres años sobre una piedra: la paciencia da fruto."],
+  ["急がば回れ", "isogaba maware", "Si tienes prisa, da un rodeo."],
+  ["習うより慣れよ", "narau yori nare yo", "Mejor acostumbrarse que estudiar: la práctica enseña."],
+  ["好きこそ物の上手なれ", "suki koso mono no jōzu nare", "Lo que te gusta es lo que mejor se te da."],
+  ["笑う門には福来る", "warau kado ni wa fuku kitaru", "La fortuna llega a la casa donde se ríe."],
+  ["雨降って地固まる", "ame futte ji katamaru", "Tras la lluvia, la tierra se asienta."],
+  ["案ずるより産むが易し", "anzuru yori umu ga yasushi", "Hacerlo es más fácil que preocuparse."],
+  ["猿も木から落ちる", "saru mo ki kara ochiru", "Hasta los monos se caen de los árboles."],
+  ["花より団子", "hana yori dango", "Mejor dango que flores: lo práctico antes que lo bonito."],
+].map(([jp, romaji, es]) => ({ jp, romaji, es }));

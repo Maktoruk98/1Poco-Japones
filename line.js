@@ -425,49 +425,87 @@ function lineHomeCard() {
     </a>`;
 }
 
-// ---------- Portada: pantalla de carga e inicio de sesión ----------
+// ---------- Portada: intro, inicio de sesión y pantalla de carga ----------
 
 const coverShownAt = Date.now();
 let coverMinMs = 1200;
 
+// Fondo del Fuji al amanecer: cielo melocotón y montaña lavanda, anclado abajo.
+function fujiBackground() {
+  return `
+    <svg class="fuji" viewBox="0 0 390 844" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="fuji-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f6f1ea"/><stop offset=".45" stop-color="#f8e9dd"/><stop offset=".72" stop-color="#f6ddd3"/><stop offset="1" stop-color="#f3e7e4"/>
+        </linearGradient>
+        <linearGradient id="fuji-mount" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ddd3e2"/><stop offset="1" stop-color="#ebe3ea"/>
+        </linearGradient>
+      </defs>
+      <rect class="fuji-sky" width="390" height="844" fill="url(#fuji-sky)"/>
+      <g class="fuji-land">
+        <path d="M-20 790 L60 744 L120 730 L190 748 L260 728 L330 740 L410 716 L410 844 L-20 844 Z" fill="#efe6e6"/>
+        <path d="M-40 800 C40 770 110 720 150 668 C165 646 176 626 184 610 L206 610 C214 626 225 646 240 668 C280 720 350 770 430 800 L430 844 L-40 844 Z" fill="url(#fuji-mount)"/>
+        <path d="M184 610 L206 610 C212 622 220 638 229 652 L222 648 L214 660 L206 650 L197 664 L189 650 L180 662 L172 650 L163 654 C171 640 178 624 184 610 Z" fill="#faf7f3"/>
+        <path d="M-20 812 C80 800 150 815 230 806 C300 798 360 812 410 806 L410 844 L-20 844 Z" fill="#f4eeec" opacity=".9"/>
+      </g>
+    </svg>`;
+}
+
+function proverbOfTheDay() {
+  return PROVERBS[dayIndex() % PROVERBS.length];
+}
+
 // mode: "loading" (abriendo la app) | "login" (falta iniciar sesión) | "offline" (sin nube)
-function renderCover(mode) {
+// still: sin animaciones de entrada (al llegar desde la intro, que ya ha dibujado el anillo)
+function renderCover(mode, { still = false } = {}) {
+  if (introPlaying) {
+    introNext = mode;
+    return;
+  }
   const cover = document.getElementById("cover");
   const signedIn = mode === "loading" && storeKey !== STORE_BASE;
+  still = still || introDone;
   cover.hidden = false;
   cover.classList.remove("leaving");
   document.body.classList.add("covered");
 
   if (signedIn) {
-    const lv = levelFor(totalXp());
-    coverMinMs = ringAnimationMs();
+    const stops = lineStops();
+    const [nextJp, nextEn] = stationName(stops.length + pendingStops());
+    const p = proverbOfTheDay();
+    coverMinMs = Math.max(ringAnimationMs(), 4000); // tiempo para leer el proverbio
     cover.innerHTML = `
+      ${fujiBackground()}
       <div class="ac">
         <div class="ac-kicker"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
         <div class="ac-ring">${ringSVG({ animate: true })}</div>
-        <h1 class="ac-title small">A bordo de tu línea</h1>
+        <h1 class="ac-welcome" lang="ja">おかえりなさい<small>OKAERINASAI</small></h1>
+        <p class="ac-sub">Ya estás de vuelta en tu pequeño Japón.</p>
         <div class="ac-rule"></div>
-        <p>Nivel ${lv.level} · <span lang="ja">${lv.jp}</span> ${esc(lv.es)}</p>
-        <div class="ac-action"><p class="ac-loading">CARGANDO</p></div>
+        <p class="ac-trip">Estación ${Math.min(stops.length, LOOP_STATIONS)} de ${LOOP_STATIONS} · siguiente: <b lang="ja">${nextJp}</b> ${nextEn}</p>
+        <div class="ac-proverb"><b lang="ja">${p.jp}</b><span>${esc(p.romaji)} · «${esc(p.es.replace(/\.$/, ""))}»</span></div>
+        <div class="ac-action"><p class="ac-depart"><b lang="ja">まもなく発車します</b>Salimos en un momento</p></div>
       </div>`;
     return;
   }
 
   coverMinMs = 1200;
   cover.innerHTML = `
-    <div class="ac">
+    ${fujiBackground()}
+    <div class="ac ${still ? "still" : ""}">
       <div class="ac-kicker"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
-      <div class="ac-ring">${ringSVG({ mode: "login", animate: true })}</div>
+      <div class="ac-ring">${ringSVG({ mode: "login", animate: !still })}</div>
       <h1 class="ac-title">Un poco más japonés</h1>
       <div class="ac-rule"></div>
-      <p>Diecinueve estaciones.<br>Una palabra por cada nivel.</p>
+      <p class="ac-sub">Diecinueve estaciones.<br>Una palabra por cada nivel.</p>
       <div class="ac-action">
         ${
           mode === "login"
             ? `<button class="ac-google" data-cloud="in">${GOOGLE_LOGO}Continuar con Google</button>`
             : mode === "offline"
-              ? `<p>Sin conexión con la nube.</p><button class="ac-plain" data-cover="enter">Continuar sin sesión</button>`
-              : `<p class="ac-loading">CARGANDO</p>`
+              ? `<p class="ac-sub">Sin conexión con la nube.</p><button class="ac-plain" data-cover="enter">Continuar sin sesión</button>`
+              : `<p class="ac-depart"><b lang="ja">まもなく発車します</b>Salimos en un momento</p>`
         }
       </div>
     </div>`;
@@ -475,6 +513,10 @@ function renderCover(mode) {
 }
 
 function hideCover() {
+  if (introPlaying) {
+    introNext = "hide";
+    return;
+  }
   const wait = Math.max(0, coverMinMs - (Date.now() - coverShownAt));
   setTimeout(() => {
     const cover = document.getElementById("cover");
@@ -485,6 +527,89 @@ function hideCover() {
       if (pendingStops()) openChooser();
     }, 450);
   }, wait);
+}
+
+// ---------- Intro (12 s, se puede saltar) ----------
+
+const INTRO_MS = 12000;
+let introPlaying = false;
+let introDone = false; // tras la intro, la portada ya no repite sus animaciones de entrada
+let introNext = null; // lo que pidió la app mientras sonaba la intro: "login", "offline", "loading" o "hide"
+let introTimers = [];
+
+// Cada paso: [momento en ms, qué hace]. Las escenas se encienden con la clase "on".
+const INTRO_STEPS = [
+  [200, "sun"], [700, "line-1"], [2300, "land"], [3200, "line-1-out"], [3600, "line-2"],
+  [5800, "line-2-out"], [6100, "ring"], [7300, "line-3"], [9300, "line-3-out"], [9700, "title"],
+];
+
+// El sol de la intro viaja hasta Bentenchō y se convierte en su punto.
+function sunToBentencho() {
+  const [x, y] = ringPoint(FIRST_STATION_NUMBER);
+  return `--dx:${(x - RING.cx).toFixed(1)}px;--dy:${(y - RING.cy).toFixed(1)}px`;
+}
+
+function playIntro() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  introPlaying = true;
+  const cover = document.getElementById("cover");
+  cover.hidden = false;
+  document.body.classList.add("covered");
+  cover.innerHTML = `
+    ${fujiBackground()}
+    <div class="intro" id="intro">
+      <button type="button" class="intro-skip" data-skip>Saltar ›</button>
+      <div class="ac">
+        <div class="ac-kicker intro-late"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
+        <div class="ac-ring">
+          <svg class="loop-ring" viewBox="0 0 360 360" aria-hidden="true">
+            <circle class="intro-sun" cx="${RING.cx}" cy="${RING.cy}" r="16" style="${sunToBentencho()}"/>
+            <g class="intro-ring"></g>
+          </svg>
+        </div>
+        <div class="intro-lines">
+          <p class="intro-line" data-line="1"><b lang="ja">少しずつ</b><span>sukoshi zutsu · poco a poco</span></p>
+          <p class="intro-line" data-line="2">Volviste de Japón.<br>Japón no se ha ido de ti.</p>
+          <p class="intro-line" data-line="3">Cada nivel, una estación.<br>Cada estación, una palabra.</p>
+          <h1 class="intro-title">Un poco más japonés</h1>
+        </div>
+      </div>
+    </div>`;
+  const intro = cover.querySelector("#intro");
+  cover.classList.add("intro-mode");
+  INTRO_STEPS.forEach(([ms, step]) =>
+    introTimers.push(
+      setTimeout(() => {
+        // El anillo se inserta justo ahora para que su animación de dibujo empiece en este momento.
+        if (step === "ring") intro.querySelector(".intro-ring").innerHTML = ringSVG({ mode: "login", animate: true }).replace(/^[\s\S]*?<svg[^>]*>|<\/svg>\s*$/g, "");
+        cover.classList.add(`s-${step}`);
+      }, ms)
+    )
+  );
+  introTimers.push(setTimeout(endIntro, INTRO_MS));
+  intro.querySelector("[data-skip]").addEventListener("click", endIntro);
+  return true;
+}
+
+function endIntro() {
+  if (!introPlaying) return;
+  introTimers.forEach(clearTimeout);
+  introTimers = [];
+  introPlaying = false;
+  introDone = true;
+  const cover = document.getElementById("cover");
+  cover.classList.remove("intro-mode", ...[...cover.classList].filter((c) => c.startsWith("s-")));
+  const next = introNext;
+  introNext = null;
+  if (next === "hide") {
+    coverMinMs = 0;
+    hideCover();
+  } else if (next === "offline" || next === "login") {
+    renderCover(next, { still: true });
+  } else {
+    // La app aún no ha dicho nada (la nube tarda): enseñamos el inicio sin botón hasta que conteste.
+    renderCover("loading", { still: true });
+  }
 }
 
 const GOOGLE_LOGO = `<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
