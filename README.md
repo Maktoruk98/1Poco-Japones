@@ -35,7 +35,7 @@ y abre http://localhost:8000.
 
 ## Portada y cuentas con Google
 
-Sin sesión, la app abre con una intro de 12 segundos (se puede saltar): un sol sobre el
+Sin sesión, la app abre con una intro de 12 segundos con melodía de caja de música (se puede saltar): un sol sobre el
 Fuji al amanecer que se convierte en el anillo de la Loop Line, y después el inicio de sesión
 con Google. Con sesión, la pantalla de carga muestra tus estaciones en el anillo,
 «おかえりなさい», la siguiente estación y un proverbio japonés distinto cada día. Con Firebase configurado, cada persona inicia sesión con
@@ -58,4 +58,5 @@ cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
 - `app.js` — lógica: rutas, cuestionarios, progreso
 - `line.js` — la Loop Line: estaciones, anillo, carteles, elección de palabra, romaji → hiragana y portada
 - `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube
+- `intro.mp3` — melodía de la intro (caja de música)
 - `sw.js`, `manifest.webmanifest`, `icon.svg` — soporte PWA/offline

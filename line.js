@@ -558,7 +558,10 @@ function playIntro() {
   cover.innerHTML = `
     ${fujiBackground()}
     <div class="intro" id="intro">
-      <button type="button" class="intro-skip" data-skip>Saltar ›</button>
+      <div class="intro-buttons">
+        <button type="button" class="intro-sound" data-sound aria-pressed="false" hidden>♪ Activar sonido</button>
+        <button type="button" class="intro-skip" data-skip>Saltar ›</button>
+      </div>
       <div class="ac">
         <div class="ac-kicker intro-late"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
         <div class="ac-ring">
@@ -587,8 +590,56 @@ function playIntro() {
     )
   );
   introTimers.push(setTimeout(endIntro, INTRO_MS));
-  intro.querySelector("[data-skip]").addEventListener("click", endIntro);
+  intro.querySelector("[data-skip]").addEventListener("click", () => {
+    fadeOutMusic();
+    endIntro();
+  });
+  startMusic(intro.querySelector("[data-sound]"));
   return true;
+}
+
+// ---------- Melodía de la intro (caja de música, 8 s) ----------
+
+let introMusic = null;
+
+// Los navegadores solo dejan sonar audio tras un toque: lo intentamos y, si no se puede,
+// aparece «Activar sonido». Al pulsarlo, la melodía empieza desde el principio.
+function startMusic(button) {
+  try {
+    introMusic = new Audio("intro.mp3");
+  } catch {
+    return;
+  }
+  introMusic.volume = 0.8;
+  const show = (on) => {
+    button.hidden = false;
+    button.setAttribute("aria-pressed", String(on));
+    button.textContent = on ? "♪ Sonido" : "♪ Activar sonido";
+  };
+  button.addEventListener("click", () => {
+    if (introMusic.paused) {
+      introMusic.currentTime = 0;
+      introMusic.volume = 0.8;
+      introMusic.play().then(() => show(true)).catch(() => show(false));
+    } else {
+      introMusic.pause();
+      show(false);
+    }
+  });
+  introMusic.addEventListener("ended", () => show(false));
+  introMusic.play().then(() => show(true)).catch(() => show(false));
+}
+
+function fadeOutMusic() {
+  const music = introMusic;
+  if (!music || music.paused) return;
+  const step = setInterval(() => {
+    music.volume = Math.max(0, music.volume - 0.08);
+    if (music.volume === 0) {
+      clearInterval(step);
+      music.pause();
+    }
+  }, 50);
 }
 
 function endIntro() {

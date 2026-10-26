@@ -431,11 +431,15 @@ body.covered { overflow: hidden; }
 /* ---------- Intro (12 s): las clases s-* se van añadiendo a #cover ---------- */
 
 .intro { position: relative; z-index: 1; min-height: 100%; }
-.intro-skip {
+.intro-buttons {
   position: fixed;
   top: calc(14px + env(safe-area-inset-top));
   right: max(16px, env(safe-area-inset-right));
   z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+.intro-skip, .intro-sound {
   font: 500 13px "Zen Kaku Gothic New", system-ui, sans-serif;
   color: #5e564e;
   background: rgba(255, 255, 255, .55);
@@ -444,7 +448,8 @@ body.covered { overflow: hidden; }
   padding: 6px 14px;
   backdrop-filter: blur(4px);
 }
-.intro-skip:focus-visible { outline: 2px solid var(--loop); outline-offset: 2px; }
+.intro-skip:focus-visible, .intro-sound:focus-visible { outline: 2px solid var(--loop); outline-offset: 2px; }
+.intro-sound[aria-pressed="true"] { color: var(--loop); border-color: rgba(200, 36, 58, .35); }
 .cover.intro-mode .fuji-sky { opacity: 0; }
 .cover.intro-mode .fuji-land { opacity: 0; transform: translateY(170px); }
 .cover.s-land .fuji-sky { opacity: 1; }
