@@ -559,7 +559,7 @@ function playIntro() {
     ${fujiBackground()}
     <div class="intro" id="intro">
       <div class="intro-buttons">
-        <button type="button" class="intro-sound" data-sound aria-pressed="false" hidden>♪ Activar sonido</button>
+        <button type="button" class="intro-sound" data-sound aria-pressed="false" aria-label="Silenciar la música" hidden>♪</button>
         <button type="button" class="intro-skip" data-skip>Saltar ›</button>
       </div>
       <div class="ac">
@@ -577,9 +577,48 @@ function playIntro() {
           <h1 class="intro-title">Un poco más japonés</h1>
         </div>
       </div>
+      <button type="button" class="intro-gate" data-gate hidden><span lang="ja">タップしてスタート</span>Toca para empezar</button>
     </div>`;
   const intro = cover.querySelector("#intro");
   cover.classList.add("intro-mode");
+  intro.querySelector("[data-skip]").addEventListener("click", () => {
+    fadeOutMusic();
+    endIntro();
+  });
+
+  // La melodía y la animación arrancan juntas. Si el navegador no deja sonar audio sin un
+  // toque previo, la intro espera en «Toca para empezar» con el sol ya encendido.
+  const gate = intro.querySelector("[data-gate]");
+  const soundButton = intro.querySelector("[data-sound]");
+  introMusic = new Audio("intro.mp3");
+  introMusic.volume = 0.8;
+  introMusic
+    .play()
+    .then(() => startIntroTimeline(cover, intro, soundButton))
+    .catch(() => {
+      if (!introPlaying) return;
+      cover.classList.add("s-sun", "s-gate");
+      gate.hidden = false;
+      gate.addEventListener("click", () => {
+        gate.remove();
+        cover.classList.remove("s-gate");
+        introMusic.currentTime = 0;
+        introMusic.play().catch(() => {});
+        startIntroTimeline(cover, intro, soundButton);
+      });
+    });
+  return true;
+}
+
+function startIntroTimeline(cover, intro, soundButton) {
+  if (!introPlaying) return;
+  soundButton.hidden = false;
+  soundButton.setAttribute("aria-pressed", "true");
+  soundButton.addEventListener("click", () => {
+    introMusic.muted = !introMusic.muted;
+    soundButton.setAttribute("aria-pressed", String(!introMusic.muted));
+    soundButton.setAttribute("aria-label", introMusic.muted ? "Activar la música" : "Silenciar la música");
+  });
   INTRO_STEPS.forEach(([ms, step]) =>
     introTimers.push(
       setTimeout(() => {
@@ -590,45 +629,11 @@ function playIntro() {
     )
   );
   introTimers.push(setTimeout(endIntro, INTRO_MS));
-  intro.querySelector("[data-skip]").addEventListener("click", () => {
-    fadeOutMusic();
-    endIntro();
-  });
-  startMusic(intro.querySelector("[data-sound]"));
-  return true;
 }
 
 // ---------- Melodía de la intro (caja de música, 8 s) ----------
 
 let introMusic = null;
-
-// Los navegadores solo dejan sonar audio tras un toque: lo intentamos y, si no se puede,
-// aparece «Activar sonido». Al pulsarlo, la melodía empieza desde el principio.
-function startMusic(button) {
-  try {
-    introMusic = new Audio("intro.mp3");
-  } catch {
-    return;
-  }
-  introMusic.volume = 0.8;
-  const show = (on) => {
-    button.hidden = false;
-    button.setAttribute("aria-pressed", String(on));
-    button.textContent = on ? "♪ Sonido" : "♪ Activar sonido";
-  };
-  button.addEventListener("click", () => {
-    if (introMusic.paused) {
-      introMusic.currentTime = 0;
-      introMusic.volume = 0.8;
-      introMusic.play().then(() => show(true)).catch(() => show(false));
-    } else {
-      introMusic.pause();
-      show(false);
-    }
-  });
-  introMusic.addEventListener("ended", () => show(false));
-  introMusic.play().then(() => show(true)).catch(() => show(false));
-}
 
 function fadeOutMusic() {
   const music = introMusic;

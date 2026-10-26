@@ -449,7 +449,31 @@ body.covered { overflow: hidden; }
   backdrop-filter: blur(4px);
 }
 .intro-skip:focus-visible, .intro-sound:focus-visible { outline: 2px solid var(--loop); outline-offset: 2px; }
+.intro-sound { min-width: 38px; padding: 6px 12px; }
 .intro-sound[aria-pressed="true"] { color: var(--loop); border-color: rgba(200, 36, 58, .35); }
+.intro-sound[aria-pressed="false"] { text-decoration: line-through; }
+/* «Toca para empezar»: toda la pantalla es el botón; el sol late mientras espera */
+.intro-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: calc(38vh + env(safe-area-inset-bottom));
+  font: 500 14px "Zen Kaku Gothic New", system-ui, sans-serif;
+  letter-spacing: .14em;
+  color: #5e564e;
+  cursor: pointer;
+  animation: ac-breathe 1.8s ease-in-out infinite;
+}
+.intro-gate span { font-family: "Shippori Mincho", serif; font-weight: 600; font-size: 17px; letter-spacing: .2em; color: #1d1b19; }
+.cover.s-gate .intro-sun { animation: gate-pulse 1.8s ease-in-out infinite; }
+@keyframes gate-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 .cover.intro-mode .fuji-sky { opacity: 0; }
 .cover.intro-mode .fuji-land { opacity: 0; transform: translateY(170px); }
 .cover.s-land .fuji-sky { opacity: 1; }
