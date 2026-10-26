@@ -12,7 +12,7 @@ Una app para aprender **un poco** de japonés cada día. Sin prisas, sin sesione
   (con audio), meta diaria de práctica y racha 🔥.
 - **Línea** (環): tu propia Osaka Loop Line (大阪環状線). Cada día añades una frase en
   japonés que recuerdes, escrita como te suene, y se convierte en una parada nueva con su
-  cartel al estilo JR West. La primera es 弁天町 (Bentenchō, JR-O14). Con 19 paradas
+  cartel al estilo JR West. La primera es 弁天町 (Bentenchō, JR-O15). Con 19 paradas
   completas la vuelta al anillo.
 - **Kana**: práctica de hiragana, katakana o ambos.
 - **Palabras**: vocabulario básico en las dos direcciones (japonés ⇄ español).

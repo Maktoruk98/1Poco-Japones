@@ -2,9 +2,9 @@
 // (大阪環状線). También dibuja la portada (pantalla de carga e inicio de sesión).
 
 const LOOP_STATIONS = 19; // la Loop Line real tiene 19 estaciones
-const FIRST_STATION_NUMBER = 14; // Bentenchō es la JR-O14
+const FIRST_STATION_NUMBER = 15; // Bentenchō es la JR-O15 (la numeración empieza en Tennōji)
 const LINE_XP = 15;
-const COVER_MIN_MS = 1600; // lo que tarda el tren en entrar al andén
+const COVER_MIN_MS = 2200; // tiempo para ver aparecer tus paradas en el mapa
 
 const FIRST_STOP = {
   id: "stop-bentencho",
@@ -139,32 +139,119 @@ function stationSign(index, { compact = false } = {}) {
     </div>`;
 }
 
-// ---------- Mapa del anillo ----------
+// ---------- Mapa de Osaka (recreado a partir del mapa de JR West) ----------
 
-function loopMap(selected) {
-  const stops = lineStops();
-  const lap = Math.floor(selected / LOOP_STATIONS);
-  const R = 120;
+// Las 19 estaciones de la Loop Line en orden de número (JR-O01 … JR-O19).
+// box: estación de transbordo (rectángulo negro, "v" vertical u "h" horizontal).
+// side: dónde va la etiqueta (r derecha, l izquierda, t arriba, b abajo; bl/br abajo a un lado).
+const MAP_STATIONS = [
+  { en: "Tennōji", jp: "天王寺", x: 450, y: 885, box: "v", side: "br" },
+  { en: "Teradachō", jp: "寺田町", x: 535, y: 822, side: "r" },
+  { en: "Momodani", jp: "桃谷", x: 598, y: 759, side: "l" },
+  { en: "Tsuruhashi", jp: "鶴橋", x: 612, y: 700, side: "l" },
+  { en: "Tamatsukuri", jp: "玉造", x: 612, y: 645, side: "l" },
+  { en: "Morinomiya", jp: "森ノ宮", x: 612, y: 590, side: "l" },
+  { en: "Ōsakajōkōen", jp: "大阪城公園", x: 612, y: 535, side: "l" },
+  { en: "Kyōbashi", jp: "京橋", x: 612, y: 452, box: "h", side: "t" },
+  { en: "Sakuranomiya", jp: "桜ノ宮", x: 583, y: 356, side: "l" },
+  { en: "Temma", jp: "天満", x: 480, y: 268, side: "b" },
+  { en: "Ōsaka", jp: "大阪", x: 372, y: 268, box: "v", side: "t" },
+  { en: "Fukushima", jp: "福島", x: 285, y: 268, side: "b" },
+  { en: "Noda", jp: "野田", x: 165, y: 370, side: "l" },
+  { en: "Nishikujō", jp: "西九条", x: 150, y: 489, box: "h", side: "t" },
+  { en: "Bentenchō", jp: "弁天町", x: 150, y: 585, side: "r" },
+  { en: "Taishō", jp: "大正", x: 150, y: 692, side: "r" },
+  { en: "Ashiharabashi", jp: "芦原橋", x: 187, y: 802, side: "r" },
+  { en: "Imamiya", jp: "今宮", x: 235, y: 850, side: "r" },
+  { en: "Shin-Imamiya", jp: "新今宮", x: 352, y: 885, box: "v", side: "bl" },
+];
+
+const LOOP_PATH = "M270 268 L495 268 L612 385 L612 745 L472 885 L270 885 L150 765 L150 385 Z";
+
+// Otras líneas, solo para ambientar (colores del mapa de JR West).
+const MAP_LINES = [
+  { color: "#f6b81a", d: "M-40 20 L60 110 L140 125 L240 205 L372 205" },
+  { color: "#0a74c8", d: "M-40 250 L100 150 L140 150 L240 240 L450 240 L490 200 L490 -80" },
+  { color: "#e8338f", d: "M185 80 L200 100 L200 300 L230 340 L340 452 L840 452" },
+  { color: "#22409a", d: "M130 489 L130 570 L60 640 L-40 700" },
+  { color: "#3e7396", d: "M560 -80 L560 40 L640 40 L700 100 L700 400 L752 452" },
+  { color: "#3e7396", d: "M840 690 L700 830 L700 1000 L740 1035 L840 1035" },
+  { color: "#00a86b", d: "M290 705 L245 750 L245 800 L290 845 L490 845 L520 870 L690 1035 L840 1035" },
+  { color: "#f6a01a", d: "M470 815 L505 815 L525 840 L525 900 L130 1300" },
+];
+
+function mapDots(d) {
+  // Puntos blancos repartidos a lo largo de una línea recta a tramos.
+  const pts = d.match(/-?\d+ -?\d+/g).map((p) => p.split(" ").map(Number));
   const dots = [];
-  for (let slot = 0; slot < LOOP_STATIONS; slot++) {
-    const i = lap * LOOP_STATIONS + ((slot - (FIRST_STATION_NUMBER - 1) + LOOP_STATIONS) % LOOP_STATIONS);
-    const a = -Math.PI / 2 + (slot / LOOP_STATIONS) * Math.PI * 2;
-    const x = 150 + R * Math.cos(a);
-    const y = 150 + R * Math.sin(a);
-    const cls = i === selected ? "on" : i < stops.length ? "done" : "";
-    const attr = i < stops.length ? `data-stop="${i}"` : "";
-    dots.push(`<circle class="dot ${cls}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${cls === "on" ? 11 : 8}" ${attr}></circle>`);
+  for (let i = 1; i < pts.length; i++) {
+    const [x1, y1] = pts[i - 1];
+    const [x2, y2] = pts[i];
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    for (let t = 45; t < len - 30; t += 70) dots.push([x1 + ((x2 - x1) * t) / len, y1 + ((y2 - y1) * t) / len]);
   }
-  const stop = stops[selected];
-  const inLap = Math.min(LOOP_STATIONS, stops.length - lap * LOOP_STATIONS);
+  return dots.map(([x, y]) => `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="5" class="m-dot"/>`).join("");
+}
+
+function mapLabel(st, title, sub, cls = "") {
+  const below = st.box === "v" ? 82 : 38;
+  const dx = { r: 20, l: -20, t: 0, b: 0, bl: 8, br: -8 }[st.side];
+  const dy = { r: 6, l: 6, t: st.box === "v" ? -84 : st.box ? -44 : -30, b: below, bl: below, br: below }[st.side];
+  const anchor = { r: "start", l: "end", t: "middle", b: "middle", bl: "end", br: "start" }[st.side];
   return `
-    <svg class="loop" viewBox="0 0 300 300" role="img" aria-label="Mapa de tu línea">
-      <circle class="ring" cx="150" cy="150" r="${R}"></circle>
-      ${dots.join("")}
-      <text x="150" y="112" class="loop-sub" lang="ja">大阪環状線</text>
-      <text x="150" y="152" class="loop-title" lang="ja">${esc(shorten(stopTitle(stop), 7))}</text>
-      <text x="150" y="178" class="loop-sub">JR-O${stationNumber(selected)} · ${esc(shorten(stop.romaji, 22))}</text>
-      <text x="150" y="204" class="loop-sub">${inLap}/${LOOP_STATIONS} paradas · vuelta ${lap + 1}</text>
+    <g class="m-label ${cls}" text-anchor="${anchor}">
+      <text x="${st.x + dx}" y="${st.y + dy}" class="m-name">${esc(title)}</text>
+      ${sub ? `<text x="${st.x + dx}" y="${st.y + dy + 18}" class="m-sub">${esc(sub)}</text>` : ""}
+    </g>`;
+}
+
+function mapStation(st, attrs = "", cls = "") {
+  if (st.box) {
+    const [w, h] = st.box === "v" ? [30, 96] : [96, 30];
+    return `<rect class="m-box ${cls}" x="${st.x - w / 2}" y="${st.y - h / 2}" width="${w}" height="${h}" rx="5" ${attrs}/>`;
+  }
+  return `<circle class="m-stop ${cls}" cx="${st.x}" cy="${st.y}" r="${cls.includes("on") ? 11 : 8}" ${attrs}/>`;
+}
+
+// mode "names": nombres reales (inicio de sesión). mode "words": tus paradas.
+function osakaMap({ mode, selected = null, viewBox = "80 30 600 1300", animate = false } = {}) {
+  const stops = lineStops();
+  const sel = selected ?? stops.length - 1;
+  const lap = Math.floor(sel / LOOP_STATIONS);
+  const first = FIRST_STATION_NUMBER - 1;
+  const parts = [];
+  const labels = [];
+
+  MAP_STATIONS.forEach((st, n) => {
+    if (mode === "names") {
+      const here = n === first;
+      parts.push(mapStation(st, "", here ? "on here" : ""));
+      labels.push(mapLabel(st, st.en, st.jp, here ? "here" : ""));
+      return;
+    }
+    const i = lap * LOOP_STATIONS + ((n - first + LOOP_STATIONS) % LOOP_STATIONS);
+    const stop = i < stops.length ? stops[i] : null;
+    const cls = stop ? (i === sel ? "done on" : "done") : "";
+    parts.push(mapStation(st, stop ? `data-stop="${i}"` : "", cls));
+    if (stop) {
+      const order = i - lap * LOOP_STATIONS;
+      const style = animate ? ` style="animation-delay:${200 + order * 120}ms"` : "";
+      labels.push(mapLabel(st, shorten(stopTitle(stop), 7), shorten(stop.romaji, 18), `${i === sel ? "on" : ""} ${animate ? "pop" : ""}`).replace('class="m-label', `${style} class="m-label`));
+    }
+  });
+
+  return `
+    <svg class="osaka-map ${mode}" viewBox="${viewBox}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Mapa de la Osaka Loop Line">
+      <rect x="-200" y="-200" width="1200" height="1700" class="m-bg"/>
+      <path class="m-water" d="M-60 300 L70 300 Q95 300 95 325 L95 650 L30 720 L30 1000 L120 1100 L120 1350 L-60 1350 Z"/>
+      <path class="m-grey" d="M280 905 L280 1150 L330 1185 L720 1185 L760 1140 L760 980 M110 300 L110 220 L210 120 L520 120"/>
+      <path class="m-shinkansen" d="M-40 48 L290 48 L360 120 L670 120 L840 -60"/>
+      <path class="m-shinkansen dash" d="M-40 48 L290 48 L360 120 L670 120 L840 -60"/>
+      ${MAP_LINES.map((l) => `<path class="m-line" stroke="${l.color}" d="${l.d}"/>${mapDots(l.d)}`).join("")}
+      <path class="m-loop" d="${LOOP_PATH}"/>
+      <rect x="352" y="545" width="60" height="54" class="m-letter-bg"/><text x="382" y="590" class="m-letter">O</text>
+      ${parts.join("")}
+      ${labels.join("")}
     </svg>`;
 }
 
@@ -180,7 +267,8 @@ function renderLinea() {
 
   view.innerHTML = `
     <section class="card line-card">
-      ${loopMap(selectedStop)}
+      <div class="map-wrap">${osakaMap({ mode: "words", selected: selectedStop, viewBox: "100 190 580 780" })}</div>
+      <p class="map-caption"><span lang="ja">大阪環状線</span> · ${lineSummary(selectedStop)}</p>
       ${stationSign(selectedStop)}
       ${stop.es ? `<p class="stop-es">${esc(stop.es)}</p>` : ""}
       ${stop.note ? `<p class="muted">📍 ${esc(stop.note)}</p>` : ""}
@@ -250,6 +338,13 @@ function renderLinea() {
   });
 }
 
+function lineSummary(selected) {
+  const stops = lineStops();
+  const lap = Math.floor(selected / LOOP_STATIONS);
+  const inLap = Math.min(LOOP_STATIONS, stops.length - lap * LOOP_STATIONS);
+  return `${inLap}/${LOOP_STATIONS} paradas · vuelta ${lap + 1}`;
+}
+
 function lineTodayCard() {
   const stops = lineStops();
   if (addedStopToday()) {
@@ -271,44 +366,43 @@ function lineTodayCard() {
 // ---------- Portada: pantalla de carga e inicio de sesión ----------
 
 const coverShownAt = Date.now();
-let clockTimer = null;
 
-function coverClock() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-
-// mode: "loading" | "login" | "offline"
+// mode: "loading" (abriendo la app) | "login" (falta iniciar sesión) | "offline" (sin nube)
 function renderCover(mode) {
   const cover = document.getElementById("cover");
+  const signedIn = mode === "loading" && storeKey !== STORE_BASE;
   const stops = lineStops();
+  const last = stops[stops.length - 1];
   cover.hidden = false;
   cover.classList.remove("leaving");
   document.body.classList.add("covered");
+
+  if (signedIn) {
+    cover.innerHTML = `
+      ${osakaMap({ mode: "words", animate: true })}
+      <div class="cover-pill"><b lang="ja">大阪環状線</b> · ${lineSummary(stops.length - 1)}</div>
+      <div class="cover-bottom loading">
+        <p class="muted">Última parada</p>
+        <p class="cover-stop"><b lang="ja">${esc(stopTitle(last))}</b> <span>${esc(last.romaji)}</span></p>
+        <p class="muted arriving">Cargando tu línea…</p>
+      </div>`;
+    return;
+  }
+
   cover.innerHTML = `
-    <div class="cover-clock">次の電車 · PRÓXIMO TREN <b id="cover-time">${coverClock()}</b></div>
-    ${stationSign(stops.length - 1)}
-    <div class="platform">
-      <div class="train"><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="edge"></div>
-    </div>
-    <h1>Próxima parada:<br>un poco más japonés</h1>
-    <p class="muted">Puntual, como siempre. Sube a bordo.</p>
-    <div class="cover-action">
+    ${osakaMap({ mode: "names" })}
+    <div class="cover-bottom">
+      <h1>Un poco más <span>japonés</span></h1>
+      <p class="muted">Tu viaje empieza en <b lang="ja">弁天町</b> Bentenchō.<br>Cada frase que recuerdes, una parada nueva.</p>
       ${
         mode === "login"
           ? `<button class="g-btn" data-cloud="in">${GOOGLE_LOGO}Continuar con Google</button>`
           : mode === "offline"
             ? `<p class="muted">Sin conexión con la nube.</p><button data-cover="enter">Continuar sin sesión</button>`
-            : `<p class="muted arriving">El tren está entrando en la estación…</p>`
+            : `<p class="muted arriving">Cargando…</p>`
       }
     </div>`;
   cover.querySelector("[data-cover=enter]")?.addEventListener("click", () => hideCover());
-  clearInterval(clockTimer);
-  clockTimer = setInterval(() => {
-    const el = document.getElementById("cover-time");
-    if (el) el.textContent = coverClock();
-  }, 10000);
 }
 
 function hideCover() {
@@ -317,7 +411,6 @@ function hideCover() {
     const cover = document.getElementById("cover");
     cover.classList.add("leaving");
     document.body.classList.remove("covered");
-    clearInterval(clockTimer);
     setTimeout(() => (cover.hidden = true), 450);
   }, wait);
 }
