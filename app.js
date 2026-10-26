@@ -114,8 +114,10 @@ function addMoment({ id, text, xp }) {
   state.log.push({ date: dateKey(), id, text, xp });
   save();
   const after = levelFor(totalXp());
-  if (after.level > before.level) toast(`🎉 ¡Subes a nivel ${after.level}! ${after.jp} · ${after.es}`);
-  else toast(`+${xp} · ${text}`);
+  if (after.level > before.level) {
+    toast(`🎉 ¡Subes a nivel ${after.level}! ${after.jp} · ${after.es}`);
+    setTimeout(openChooser, 1200); // nueva estación: eliges su palabra
+  } else toast(`+${xp} · ${text}`);
 }
 
 function removeMomentToday(id) {
@@ -224,6 +226,7 @@ function levelCard() {
       <p><span class="muted">${esc(lv.romaji)} ·</span> <b>${esc(lv.es)}</b></p>
       <div class="progress"><div style="width:${pct}%"></div></div>
       <p class="muted">${xp} pts${next ? ` · ${next.xp - xp} para ${next.jp} (${esc(next.es)})` : " · ¡Nivel máximo!"}</p>
+      ${next ? `<p class="muted level-next">Al subir eliges la palabra de <span lang="ja">${stationName(lineStops().length + pendingStops())[0]}</span> ${stationName(lineStops().length + pendingStops())[1]}</p>` : ""}
     </section>`;
 }
 
@@ -249,7 +252,7 @@ function renderHoy() {
 
   view.innerHTML = `
     ${levelCard()}
-    ${lineTodayCard()}
+    ${lineHomeCard()}
     <section class="card">
       <h2>Momentos japoneses de hoy · +${todayXp}</h2>
       <p class="muted">¿Qué has hecho o notado hoy que te haya hecho sentir un poco más en Japón?</p>

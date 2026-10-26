@@ -325,81 +325,129 @@ details.about p { margin: 12px 0 0; line-height: 1.5; }
 
 .tabs a { font-size: .7rem; }
 
+/* ---------- El anillo (Loop Line) ---------- */
 
-/* ---------- Mapa de Osaka ---------- */
+.ring-wrap { max-width: 340px; margin: 0 auto 16px; }
+.loop-ring { display: block; width: 100%; overflow: visible; font-family: "Zen Kaku Gothic New", system-ui, sans-serif; }
+.lr-ring { fill: none; stroke: var(--loop); stroke-width: 2.2; }
+.lr-ring.draw { stroke-dasharray: 805; stroke-dashoffset: 805; animation: lr-draw 1.3s cubic-bezier(.6, 0, .3, 1) forwards; }
+@keyframes lr-draw { to { stroke-dashoffset: 0; } }
+.lr-st { fill: var(--card); stroke: var(--ink); stroke-width: 1.2; }
+.lr-on { fill: var(--loop); cursor: pointer; }
+.lr-on.sel { stroke: var(--ink); stroke-width: 1.5; }
+.lr-beat { transform-box: fill-box; transform-origin: center; animation: lr-beat 1.8s ease-in-out .5s infinite; }
+@keyframes lr-beat { 0%, 50%, 100% { transform: scale(1); } 12% { transform: scale(1.28); } 24% { transform: scale(1); } 36% { transform: scale(1.18); } }
+.lr-halo { fill: var(--loop); opacity: .08; animation: lr-glow 1.8s ease-in-out .5s infinite; }
+@keyframes lr-glow { 0%, 50%, 100% { opacity: .08; } 12% { opacity: .24; } 24% { opacity: .1; } 36% { opacity: .18; } }
+.lr-lbl { cursor: pointer; }
+.lr-name { font-family: "Shippori Mincho", serif; font-weight: 600; fill: var(--ink); }
+.lr-ro { font-size: 9.5px; fill: var(--muted); letter-spacing: .04em; }
+.lr-lbl.sel .lr-name { fill: var(--loop); }
+.lr-c { font-family: "Shippori Mincho", serif; font-weight: 600; text-anchor: middle; fill: var(--ink); }
+.lr-cs { font-size: 11px; letter-spacing: .22em; text-anchor: middle; fill: var(--muted); }
+.lr-count { fill: var(--loop); }
+.fade { opacity: 0; animation: lr-fade .5s ease-out forwards; }
+@keyframes lr-fade { to { opacity: 1; } }
+.pop { opacity: 0; transform-box: fill-box; transform-origin: center; animation: lr-pop .45s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+@keyframes lr-pop { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
+.level-next { font-size: .85rem; margin-top: -6px; }
 
-.osaka-map { display: block; width: 100%; height: 100%; font-family: "Zen Kaku Gothic New", system-ui, sans-serif; }
-.m-bg { fill: #d4ecf7; }
-.m-water { fill: #8db9e3; stroke: #a9cdee; stroke-width: 6; }
-.m-grey { fill: none; stroke: #9aa3a8; stroke-width: 3; }
-.m-shinkansen { fill: none; stroke: #2b4f9e; stroke-width: 9; }
-.m-shinkansen.dash { stroke: #fff; stroke-width: 4; stroke-dasharray: 12 10; }
-.m-line { fill: none; stroke-width: 20; stroke-linejoin: round; stroke-linecap: round; }
-.m-dot { fill: #fff; }
-.m-loop { fill: none; stroke: var(--loop); stroke-width: 24; stroke-linejoin: round; }
-.m-letter-bg { fill: var(--loop); }
-.m-letter { fill: #fff; font-size: 44px; font-weight: 500; text-anchor: middle; }
-.m-stop { fill: #fff; }
-.m-box { fill: #1d1d1d; }
-.m-stop.done { fill: #fff; stroke: #1d2327; stroke-width: 3; cursor: pointer; }
-.m-box.done { fill: #1d1d1d; stroke: #fff; stroke-width: 3; cursor: pointer; }
-.m-stop.on { fill: #fff; stroke: #1d2327; stroke-width: 5; animation: pulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.m-box.on { stroke: #ffcf3f; stroke-width: 5; }
-@keyframes pulse { 50% { transform: scale(1.35); } }
-.m-label text { paint-order: stroke; stroke: #d4ecf7; stroke-width: 6px; stroke-linejoin: round; fill: #1d2327; }
-.m-name { font-size: 22px; font-weight: 700; }
-.m-sub { font-size: 13px; font-weight: 500; }
-.m-label.on .m-name { font-size: 26px; font-weight: 900; }
-.m-label.here .m-name { font-size: 25px; font-weight: 900; }
-.m-label.pop { opacity: 0; animation: pop .45s ease-out forwards; }
-@keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.m-label.pop { transform-box: fill-box; }
+/* ---------- Portada (inicio de sesión y carga) ---------- */
 
-.map-wrap { aspect-ratio: 580 / 780; border-radius: 12px; overflow: hidden; margin: -4px -4px 10px; }
-.map-caption { text-align: center; font-size: .9rem; color: var(--muted); margin: 0 0 14px; }
-
-/* ---------- Portada ---------- */
-
-.cover { position: fixed; inset: 0; z-index: 50; background: #d4ecf7; overflow: hidden; transition: opacity .45s, transform .45s; }
-.cover > .osaka-map { position: absolute; inset: 0; }
-.cover.leaving { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  background: #f6f2ea;
+  color: #1d1b19;
+  transition: opacity .45s, transform .45s;
+  --ink: #1d1b19;
+  --muted: #7d746a;
+  --card: #f6f2ea;
+}
+.cover.leaving { opacity: 0; transform: scale(1.03); pointer-events: none; }
 body.covered { overflow: hidden; }
-.cover-bottom {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom));
+.ac {
+  min-height: 100%;
   max-width: 440px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, .94);
-  color: #1d2327;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: calc(48px + env(safe-area-inset-top)) 32px calc(36px + env(safe-area-inset-bottom));
+  font-family: "Zen Kaku Gothic New", system-ui, sans-serif;
+}
+.ac-kicker { font-size: 11px; letter-spacing: .32em; color: #7d746a; }
+.ac-kicker b { color: var(--loop); font-weight: 500; letter-spacing: .1em; }
+.ac-ring { width: 100%; max-width: 330px; margin-top: 30px; }
+.ac-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; margin: 28px 0 0; animation: ac-rise .8s .6s ease-out both; }
+.ac-title.small { font-size: 22px; }
+.ac-rule { width: 28px; height: 1px; background: var(--loop); margin: 20px auto 0; }
+.ac p { color: #7d746a; margin: 10px 0 0; font-size: 14px; line-height: 1.6; animation: ac-rise .8s .75s ease-out both; }
+.ac-action { margin-top: auto; padding-top: 28px; width: 100%; display: grid; gap: 10px; justify-items: center; }
+.ac-google, .ac-plain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  height: 52px;
+  border-radius: 26px;
+  border: 0;
+  background: #1d1b19;
+  color: #f6f2ea;
+  font: 500 16px "Zen Kaku Gothic New", system-ui, sans-serif;
+  animation: ac-rise .8s .9s ease-out both;
+}
+.ac-plain { background: transparent; color: #1d1b19; border: 1px solid #d3cbbd; }
+.ac-google svg { width: 20px; height: 20px; background: #fff; border-radius: 50%; padding: 2px; box-sizing: content-box; }
+.ac-loading { font-size: 12px !important; letter-spacing: .3em; animation: ac-breathe 1.4s ease-in-out infinite !important; }
+@keyframes ac-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ac-breathe { 50% { opacity: .35; } }
+
+/* ---------- Elegir la palabra de la nueva estación ---------- */
+
+.chooser {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(20, 16, 12, .45);
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  overflow-y: auto;
+  padding: 16px max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  animation: lr-fade .25s ease-out;
+}
+.chooser-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  color: var(--ink);
   border-radius: 22px;
-  padding: 20px 20px 22px;
+  padding: 22px 20px 16px;
   display: grid;
   gap: 10px;
-  justify-items: center;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(20, 40, 60, .2);
-  font-family: "Zen Kaku Gothic New", system-ui, sans-serif;
+  animation: ac-rise .35s ease-out;
 }
-.cover-bottom h1 { font-size: 24px; margin: 0; }
-.cover-bottom h1 span { color: var(--loop); }
-.cover-bottom p { margin: 0; color: #56636b; line-height: 1.45; }
-.cover-bottom .cover-stop { font-size: 1.1rem; color: #1d2327; }
-.cover-bottom .cover-stop span { color: #56636b; font-size: .9rem; }
-.cover-bottom.loading { gap: 4px; padding: 14px 18px 16px; }
-.cover-pill {
-  position: absolute;
-  top: calc(14px + env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1d1d1d;
-  color: #fff;
-  border-radius: 99px;
-  padding: 6px 14px;
-  font-size: .85rem;
-  white-space: nowrap;
-  font-family: "Zen Kaku Gothic New", system-ui, sans-serif;
+.chooser-card h2 { font-family: "Shippori Mincho", serif; font-size: 1.35rem; margin: 0; text-wrap: balance; }
+.chooser-card p { margin: 0; }
+.chooser-kicker { font-size: .8rem; letter-spacing: .08em; color: var(--loop); }
+.chooser-station { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
+.suggestions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.suggestion { display: grid; gap: 2px; text-align: left; padding: 10px 12px; min-width: 0; }
+.suggestion b { font-family: "Shippori Mincho", serif; font-size: 1.25rem; overflow-wrap: anywhere; }
+.suggestion span { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
+.suggestion small { font-size: .7rem; color: var(--loop); }
+.suggestion:hover { border-color: var(--loop); }
+.own summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+.own .stop-form { margin-top: 8px; }
+.later { justify-self: center; border: 0; background: none; color: var(--muted); }
+.line-pending { border-color: var(--loop); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lr-ring.draw, .fade, .pop, .lr-beat, .lr-halo, .ac-title, .ac p, .ac-google, .ac-plain, .ac-loading { animation: none !important; opacity: 1; stroke-dashoffset: 0; }
 }
-.arriving { animation: blink 1.2s infinite; }
-@keyframes blink { 50% { opacity: .4; } }

@@ -10,10 +10,10 @@ Una app para aprender **un poco** de japonés cada día. Sin prisas, sin sesione
   vuelve de Japón (el bus puntual, guardarte la basura, decir いただきます…). Cada uno
   suma puntos una vez al día, y puedes añadir los tuyos. Además: palabra y frase del día
   (con audio), meta diaria de práctica y racha 🔥.
-- **Línea** (環): tu propia Osaka Loop Line (大阪環状線). Cada día añades una frase en
-  japonés que recuerdes, escrita como te suene, y se convierte en una parada nueva con su
-  cartel al estilo JR West. La primera es 弁天町 (Bentenchō, JR-O15). Con 19 paradas
-  completas la vuelta al anillo.
+- **Línea** (環): tu propia Osaka Loop Line (大阪環状線), dibujada como un anillo de 19
+  estaciones. Hay 19 niveles, uno por estación: la primera es 弁天町 (Bentenchō, JR-O15) y,
+  cada vez que subes de nivel, eliges la palabra que quieres dejar en la siguiente (entre
+  las que más has practicado o una que escribas tú). La estación del día late suavemente.
 - **Kana**: práctica de hiragana, katakana o ambos.
 - **Palabras**: vocabulario básico en las dos direcciones (japonés ⇄ español).
 - **Progreso**: qué kana y palabras dominas.
@@ -35,8 +35,8 @@ y abre http://localhost:8000.
 
 ## Portada y cuentas con Google
 
-Al abrir la app, un tren de la Loop Line entra en el andén con el cartel de tu última
-parada: es la pantalla de carga y la de inicio de sesión. Con Firebase configurado, cada persona inicia sesión con
+Al abrir la app se dibuja el anillo de la Loop Line: sin sesión, con Bentenchō y el botón
+de Google; con sesión, como pantalla de carga en la que aparecen tus estaciones. Con Firebase configurado, cada persona inicia sesión con
 su cuenta de Google y tiene sus propios logros, guardados en la nube y disponibles en
 cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
 
@@ -54,6 +54,6 @@ cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
 - `styles.css` — estilos (modo claro y oscuro)
 - `data.js` — contenido: kana, vocabulario y frases
 - `app.js` — lógica: rutas, cuestionarios, progreso
-- `line.js` — la Loop Line: paradas, carteles, mapa, romaji → hiragana y portada
+- `line.js` — la Loop Line: estaciones, anillo, carteles, elección de palabra, romaji → hiragana y portada
 - `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube
 - `sw.js`, `manifest.webmanifest`, `icon.svg` — soporte PWA/offline

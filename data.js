@@ -159,15 +159,26 @@ const MOMENT_CATEGORIES = [
   items: cat.items.map(([id, text, xp, note]) => ({ id: `${cat.id}-${id}`, text, xp, note })),
 }));
 
+// 19 niveles, uno por estación de la Loop Line: al subir de nivel eliges la palabra
+// de la siguiente estación. El nivel 1 es Bentenchō.
 const LEVELS = [
   [0, "観光客", "kankōkyaku", "Turista con jet lag"],
-  [50, "旅人", "tabibito", "Alma viajera"],
-  [150, "常連", "jōren", "Cliente habitual"],
-  [300, "住人", "jūnin", "Gente del barrio"],
-  [500, "町の顔", "machi no kao", "Cara conocida del barrio"],
-  [800, "職人", "shokunin", "Artesanía de las costumbres"],
-  [1200, "先輩", "senpai", "Senpai"],
-  [1700, "達人", "tatsujin", "Maestría"],
-  [2400, "侍", "samurai", "Samurái de la puntualidad"],
-  [3300, "日本の心", "nihon no kokoro", "Corazón japonés"],
+  [40, "旅人", "tabibito", "Alma viajera"],
+  [100, "乗客", "jōkyaku", "Billete en mano"],
+  [180, "常連", "jōren", "Cliente habitual"],
+  [280, "通勤", "tsūkin", "Rutina de cercanías"],
+  [400, "住人", "jūnin", "Gente del barrio"],
+  [540, "町の顔", "machi no kao", "Cara conocida del barrio"],
+  [700, "見習い", "minarai", "Aprendiz"],
+  [880, "稽古", "keiko", "Práctica constante"],
+  [1080, "職人", "shokunin", "Artesanía de las costumbres"],
+  [1300, "先輩", "senpai", "Senpai"],
+  [1550, "案内人", "annainin", "Guía local"],
+  [1830, "茶人", "chajin", "Alma del té"],
+  [2140, "達人", "tatsujin", "Maestría"],
+  [2480, "師範", "shihan", "Quien enseña"],
+  [2850, "名人", "meijin", "Leyenda local"],
+  [3250, "侍", "samurai", "Samurái de la puntualidad"],
+  [3700, "将軍", "shōgun", "Shōgun"],
+  [4200, "日本の心", "nihon no kokoro", "Corazón japonés"],
 ].map(([xp, jp, romaji, es], i) => ({ level: i + 1, xp, jp, romaji, es }));
