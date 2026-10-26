@@ -10,7 +10,18 @@ const CUSTOM_XP = 5;
 
 // ---------- Estado ----------
 
-let storeKey = STORE_BASE;
+const LAST_UID_KEY = "upmj:lastUid"; // para enseñar tu línea en la portada mientras carga
+
+function initialStoreKey() {
+  try {
+    const uid = localStorage.getItem(LAST_UID_KEY);
+    return uid ? `${STORE_BASE}:${uid}` : STORE_BASE;
+  } catch {
+    return STORE_BASE;
+  }
+}
+
+let storeKey = initialStoreKey();
 
 function readStored(key) {
   try {
@@ -238,6 +249,7 @@ function renderHoy() {
 
   view.innerHTML = `
     ${levelCard()}
+    ${lineTodayCard()}
     <section class="card">
       <h2>Momentos japoneses de hoy · +${todayXp}</h2>
       <p class="muted">¿Qué has hecho o notado hoy que te haya hecho sentir un poco más en Japón?</p>
@@ -450,12 +462,12 @@ function renderProgreso() {
 }
 
 function loadStateDefaults() {
-  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], updatedAt: 0 };
+  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], line: [], updatedAt: 0 };
 }
 
 // ---------- Navegación ----------
 
-const ROUTES = { hoy: renderHoy, kana: renderKana, palabras: renderPalabras, progreso: renderProgreso };
+const ROUTES = { hoy: renderHoy, linea: renderLinea, kana: renderKana, palabras: renderPalabras, progreso: renderProgreso };
 
 function route() {
   const name = location.hash.slice(1);
@@ -468,6 +480,8 @@ function route() {
 window.addEventListener("hashchange", route);
 renderStreak();
 route();
+renderCover("loading");
+if (!FIREBASE_CONFIG) hideCover();
 
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   navigator.serviceWorker.register("sw.js").catch(() => {});

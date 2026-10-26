@@ -75,11 +75,19 @@ async function onUser(user) {
   renderAccountButton();
 
   if (!user) {
+    try {
+      localStorage.removeItem(LAST_UID_KEY);
+    } catch {}
     storeKey = STORE_BASE;
     replaceState(readStored(storeKey));
     rerender();
+    renderCover("login");
     return;
   }
+
+  try {
+    localStorage.setItem(LAST_UID_KEY, user.uid);
+  } catch {}
 
   storeKey = `${STORE_BASE}:${user.uid}`;
   let local = readStored(storeKey);
@@ -105,6 +113,7 @@ async function onUser(user) {
   persistLocal();
   if (online && !useRemote) cloudPush();
   rerender();
+  hideCover();
 }
 
 async function signIn() {
@@ -186,6 +195,7 @@ async function initCloud() {
     firebase.initializeApp(FIREBASE_CONFIG);
   } catch (e) {
     console.warn("Firebase no disponible; la app sigue en local", e);
+    renderCover("offline");
     return;
   }
   cloudReady = true;

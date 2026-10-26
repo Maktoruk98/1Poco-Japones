@@ -1,7 +1,7 @@
 // Primero intenta la red (para recibir siempre la última versión) y,
 // si no hay conexión, sirve la copia guardada.
-const CACHE = "upmj-v4";
-const FILES = ["./", "index.html", "styles.css", "data.js", "firebase-config.js", "app.js", "cloud.js", "icon.svg", "manifest.webmanifest"];
+const CACHE = "upmj-v5";
+const FILES = ["./", "index.html", "styles.css", "data.js", "firebase-config.js", "line.js", "app.js", "cloud.js", "icon.svg", "manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));
@@ -19,7 +19,7 @@ self.addEventListener("fetch", (e) => {
   // Solo cacheamos nuestros archivos y las librerías de Firebase; las llamadas
   // a la nube (inicio de sesión, base de datos) van siempre directas.
   const url = new URL(e.request.url);
-  if (e.request.method !== "GET" || (url.origin !== location.origin && url.hostname !== "www.gstatic.com")) return;
+  if (e.request.method !== "GET" || (url.origin !== location.origin && !["www.gstatic.com", "fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname))) return;
   e.respondWith(
     fetch(e.request)
       .then((res) => {

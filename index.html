@@ -4,12 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#c8102e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
   <title>Un poco más japonés</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div id="cover" class="cover" hidden></div>
+
   <header class="top">
     <h1>Un poco más <span class="jp">japonés</span></h1>
     <div class="row">
@@ -22,6 +27,7 @@
 
   <nav class="tabs">
     <a href="#hoy" data-tab="hoy"><span>今日</span>Hoy</a>
+    <a href="#linea" data-tab="linea"><span>環</span>Línea</a>
     <a href="#kana" data-tab="kana"><span>あ</span>Kana</a>
     <a href="#palabras" data-tab="palabras"><span>語</span>Palabras</a>
     <a href="#progreso" data-tab="progreso"><span>進</span>Progreso</a>
@@ -29,6 +35,7 @@
 
   <script src="data.js"></script>
   <script src="firebase-config.js"></script>
+  <script src="line.js"></script>
   <script src="app.js"></script>
   <script src="cloud.js"></script>
 </body>

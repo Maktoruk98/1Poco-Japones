@@ -10,6 +10,10 @@ Una app para aprender **un poco** de japonés cada día. Sin prisas, sin sesione
   vuelve de Japón (el bus puntual, guardarte la basura, decir いただきます…). Cada uno
   suma puntos una vez al día, y puedes añadir los tuyos. Además: palabra y frase del día
   (con audio), meta diaria de práctica y racha 🔥.
+- **Línea** (環): tu propia Osaka Loop Line (大阪環状線). Cada día añades una frase en
+  japonés que recuerdes, escrita como te suene, y se convierte en una parada nueva con su
+  cartel al estilo JR West. La primera es 弁天町 (Bentenchō, JR-O14). Con 19 paradas
+  completas la vuelta al anillo.
 - **Kana**: práctica de hiragana, katakana o ambos.
 - **Palabras**: vocabulario básico en las dos direcciones (japonés ⇄ español).
 - **Progreso**: qué kana y palabras dominas.
@@ -29,9 +33,10 @@ python3 -m http.server 8000
 
 y abre http://localhost:8000.
 
-## Cuentas con Google (opcional)
+## Portada y cuentas con Google
 
-Con Firebase configurado aparece un botón **Entrar**: cada persona inicia sesión con
+Al abrir la app, un tren de la Loop Line entra en el andén con el cartel de tu última
+parada: es la pantalla de carga y la de inicio de sesión. Con Firebase configurado, cada persona inicia sesión con
 su cuenta de Google y tiene sus propios logros, guardados en la nube y disponibles en
 cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
 
@@ -49,5 +54,6 @@ cualquier dispositivo. Sin configurar, la app funciona igual, solo en local.
 - `styles.css` — estilos (modo claro y oscuro)
 - `data.js` — contenido: kana, vocabulario y frases
 - `app.js` — lógica: rutas, cuestionarios, progreso
+- `line.js` — la Loop Line: paradas, carteles, mapa, romaji → hiragana y portada
 - `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube
 - `sw.js`, `manifest.webmanifest`, `icon.svg` — soporte PWA/offline
