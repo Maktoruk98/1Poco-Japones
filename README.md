@@ -42,6 +42,10 @@ anillo de la Loop Line. Sin sesión, termina en el inicio de sesión con Google;
 termina como pantalla de carga: tus estaciones, «おかえりなさい», la siguiente estación y un
 proverbio japonés distinto cada día. Desde Progreso se puede volver a ver.
 
+Con Firebase configurado, cada persona inicia sesión con su cuenta de Google y tiene sus
+propios logros, guardados en la nube y disponibles en cualquier dispositivo. Sin configurar,
+la app funciona igual, solo en local. Para configurarlo:
+
 1. En https://console.firebase.google.com crea un proyecto (Analytics no hace falta).
 2. **Authentication → Comenzar → Google**: habilítalo y guarda.
 3. **Authentication → Configuración → Dominios autorizados**: añade `maktoruk98.github.io`.
