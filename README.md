@@ -40,12 +40,13 @@ y abre http://localhost:8000.
 
 ## Portada y cuentas con Google
 
-Cada vez que se abre, la app empieza con una intro de 12 segundos con melodía de caja de
-música (se puede saltar; en el móvil empieza con «Toca para empezar», porque sin un toque el
-navegador no deja sonar audio). Un sol sale sobre el Fuji al amanecer y se convierte en el
-anillo de la Loop Line. Sin sesión, termina en el inicio de sesión con Google; con sesión,
-termina como pantalla de carga (unos segundos más, o toca para entrar): tus estaciones, «おかえりなさい», la siguiente estación y un
-proverbio japonés distinto cada día. Desde Progreso se puede volver a ver.
+Al abrir la app empieza una intro sincronizada con una melodía de caja de música de 21 segundos
+(se puede saltar; en el móvil empieza con «Toca para empezar», porque sin un toque el navegador no
+deja sonar audio). Un sol sale sobre el Fuji al amanecer y se convierte en el anillo de la Loop Line,
+con textos que pasan del japonés al castellano. Sin sesión termina en el inicio de sesión con Google;
+con sesión termina como pantalla de carga: tus estaciones, おかえりなさい y un proverbio japonés
+distinto cada día (toca para entrar). A la tercera intro con sesión, la app pregunta si quieres
+saltártela; en Progreso se puede activar o desactivar.
 
 Con Firebase configurado, cada persona inicia sesión con su cuenta de Google y tiene sus
 propios logros, guardados en la nube y disponibles en cualquier dispositivo. Sin configurar,

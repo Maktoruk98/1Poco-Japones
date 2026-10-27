@@ -508,7 +508,6 @@ function renderCover(mode, { still = false } = {}) {
       <div class="ac-ring">${ringSVG({ mode: "login", animate: !still })}</div>
       <h1 class="ac-title">Un poco más japonés</h1>
       <div class="ac-rule"></div>
-      <p class="ac-sub">Diecinueve estaciones.<br>Una palabra por cada nivel.</p>
       <div class="ac-action">
         ${
           mode === "login"
