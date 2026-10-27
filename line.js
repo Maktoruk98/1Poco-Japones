@@ -534,8 +534,8 @@ function hideCover() {
 
 // ---------- Intro (12 s, se puede saltar) ----------
 
-const INTRO_MS = 12000;
-const INTRO_SIGNED_MS = 17000; // con sesión, unos 7 s más para leer el final (o tocar para entrar antes)
+const INTRO_MS = 13200;
+const INTRO_SIGNED_MS = 18200; // con sesión, unos 7 s más para leer el final (o tocar para entrar antes)
 let introPlaying = false;
 let introDone = false; // tras la intro, la portada ya no repite sus animaciones de entrada
 let introSigned = false; // con sesión, la intro termina como pantalla de carga (tus estaciones, proverbio…)
@@ -545,7 +545,7 @@ let introTimers = [];
 // Cada paso: [momento en ms, qué hace]. Las escenas se encienden con la clase "on".
 const INTRO_STEPS = [
   [200, "sun"], [700, "line-1"], [2300, "land"], [3200, "line-1-out"], [3600, "line-2"],
-  [5800, "line-2-out"], [6100, "ring"], [7300, "line-3"], [9300, "line-3-out"], [9700, "title"],
+  [6600, "line-2-out"], [6900, "ring"], [8100, "line-3"], [10100, "line-3-out"], [10900, "title"],
 ];
 
 // El sol de la intro viaja hasta Bentenchō y se convierte en su punto.
@@ -568,6 +568,7 @@ function playIntro() {
   const cover = document.getElementById("cover");
   cover.hidden = false;
   resetCoverClasses(cover);
+  cover.classList.add("intro-mode"); // antes de pintar: el Fuji empieza oculto, sin transición
   document.body.classList.add("covered");
   const stops = lineStops();
   const [nextJp, nextEn] = stationName(stops.length + pendingStops());
@@ -598,16 +599,20 @@ function playIntro() {
           </svg>
         </div>
         <div class="intro-lines">
-          <p class="intro-line" data-line="1"><b lang="ja">少しずつ</b><span>sukoshi zutsu · poco a poco</span></p>
-          <p class="intro-line" data-line="2">Volviste de Japón.<br>Japón no se ha ido de ti.</p>
-          <p class="intro-line" data-line="3">${introSigned ? "Tu línea te estaba esperando." : "Cada nivel, una estación.<br>Cada estación, una palabra."}</p>
+          <p class="intro-line" data-line="1">
+            <span class="swap"><b class="swap-a" lang="ja">少しずつ</b><b class="swap-b">poco a poco</b></span>
+            <span>sukoshi zutsu</span>
+          </p>
+          <p class="intro-line" data-line="2">Volviste a casa,<br>pero una parte de ti…<br>sigue esperando un tren en Osaka.</p>
+          <p class="intro-line" data-line="3">Un poco cada día,<br>un poco más japonés.</p>
           ${ending}
         </div>
       </div>
-      <button type="button" class="intro-gate" data-gate hidden><span lang="ja">タップしてスタート</span>Toca para empezar</button>
+      <button type="button" class="intro-gate" data-gate hidden aria-label="Toca para empezar">
+        <span class="gate-words"><span class="gate-a" lang="ja">タップしてスタート</span><span class="gate-b">Toca para empezar</span></span>
+      </button>
     </div>`;
   const intro = cover.querySelector("#intro");
-  cover.classList.add("intro-mode");
   intro.querySelector("[data-skip]").addEventListener("click", () => {
     fadeOutMusic();
     endIntro({ skipped: true });
