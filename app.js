@@ -490,8 +490,9 @@ function route() {
 window.addEventListener("hashchange", route);
 renderStreak();
 route();
-// Sin sesión guardada: intro de 12 s antes del inicio de sesión. Con sesión: pantalla de carga.
-if (storeKey !== STORE_BASE || !playIntro()) renderCover("loading");
+// Siempre que se abre la app: intro de 12 s con melodía. Sin sesión termina en el inicio de
+// sesión; con sesión termina como pantalla de carga. Con «reducir movimiento», solo la carga.
+if (!playIntro()) renderCover("loading");
 if (!FIREBASE_CONFIG) hideCover();
 
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

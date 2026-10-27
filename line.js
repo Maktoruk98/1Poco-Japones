@@ -467,7 +467,7 @@ function renderCover(mode, { still = false } = {}) {
   const signedIn = mode === "loading" && storeKey !== STORE_BASE;
   still = still || introDone;
   cover.hidden = false;
-  cover.classList.remove("leaving");
+  resetCoverClasses(cover);
   document.body.classList.add("covered");
 
   if (signedIn) {
@@ -534,6 +534,7 @@ function hideCover() {
 const INTRO_MS = 12000;
 let introPlaying = false;
 let introDone = false; // tras la intro, la portada ya no repite sus animaciones de entrada
+let introSigned = false; // con sesión, la intro termina como pantalla de carga (tus estaciones, proverbio…)
 let introNext = null; // lo que pidió la app mientras sonaba la intro: "login", "offline", "loading" o "hide"
 let introTimers = [];
 
@@ -559,10 +560,23 @@ function replayIntro() {
 function playIntro() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   introPlaying = true;
+  introSigned = storeKey !== STORE_BASE;
   const cover = document.getElementById("cover");
   cover.hidden = false;
-  cover.classList.remove("leaving");
+  resetCoverClasses(cover);
   document.body.classList.add("covered");
+  const stops = lineStops();
+  const [nextJp, nextEn] = stationName(stops.length + pendingStops());
+  const p = proverbOfTheDay();
+  const ending = introSigned
+    ? `<div class="intro-title intro-final">
+         <h1 class="ac-welcome" lang="ja">おかえりなさい<small>OKAERINASAI</small></h1>
+         <p class="ac-sub">Ya estás de vuelta en tu pequeño Japón.</p>
+         <div class="ac-rule"></div>
+         <p class="ac-trip">Estación ${Math.min(stops.length, LOOP_STATIONS)} de ${LOOP_STATIONS} · siguiente: <b lang="ja">${nextJp}</b> ${nextEn}</p>
+         <div class="ac-proverb"><b lang="ja">${p.jp}</b><span>${esc(p.romaji)} · «${esc(p.es.replace(/\.$/, ""))}»</span></div>
+       </div>`
+    : `<h1 class="intro-title">Un poco más japonés</h1>`;
   cover.innerHTML = `
     ${fujiBackground()}
     <div class="intro" id="intro">
@@ -581,8 +595,8 @@ function playIntro() {
         <div class="intro-lines">
           <p class="intro-line" data-line="1"><b lang="ja">少しずつ</b><span>sukoshi zutsu · poco a poco</span></p>
           <p class="intro-line" data-line="2">Volviste de Japón.<br>Japón no se ha ido de ti.</p>
-          <p class="intro-line" data-line="3">Cada nivel, una estación.<br>Cada estación, una palabra.</p>
-          <h1 class="intro-title">Un poco más japonés</h1>
+          <p class="intro-line" data-line="3">${introSigned ? "Tu línea te estaba esperando." : "Cada nivel, una estación.<br>Cada estación, una palabra."}</p>
+          ${ending}
         </div>
       </div>
       <button type="button" class="intro-gate" data-gate hidden><span lang="ja">タップしてスタート</span>Toca para empezar</button>
@@ -591,7 +605,7 @@ function playIntro() {
   cover.classList.add("intro-mode");
   intro.querySelector("[data-skip]").addEventListener("click", () => {
     fadeOutMusic();
-    endIntro();
+    endIntro({ skipped: true });
   });
 
   // La melodía y la animación arrancan juntas. Si el navegador no deja sonar audio sin un
@@ -631,7 +645,7 @@ function startIntroTimeline(cover, intro, soundButton) {
     introTimers.push(
       setTimeout(() => {
         // El anillo se inserta justo ahora para que su animación de dibujo empiece en este momento.
-        if (step === "ring") intro.querySelector(".intro-ring").innerHTML = ringSVG({ mode: "login", animate: true }).replace(/^[\s\S]*?<svg[^>]*>|<\/svg>\s*$/g, "");
+        if (step === "ring") intro.querySelector(".intro-ring").innerHTML = ringSVG({ mode: introSigned ? "words" : "login", animate: true }).replace(/^[\s\S]*?<svg[^>]*>|<\/svg>\s*$/g, "");
         cover.classList.add(`s-${step}`);
       }, ms)
     )
@@ -655,25 +669,34 @@ function fadeOutMusic() {
   }, 50);
 }
 
-function endIntro() {
+function endIntro({ skipped = false } = {}) {
   if (!introPlaying) return;
   introTimers.forEach(clearTimeout);
   introTimers = [];
   introPlaying = false;
   introDone = true;
   const cover = document.getElementById("cover");
-  cover.classList.remove("intro-mode", ...[...cover.classList].filter((c) => c.startsWith("s-")));
+  cover.classList.remove("intro-mode", "s-gate");
   const next = introNext;
   introNext = null;
+  coverMinMs = 0;
   if (next === "hide") {
-    coverMinMs = 0;
     hideCover();
   } else if (next === "offline" || next === "login") {
     renderCover(next, { still: true });
+  } else if (introSigned && !skipped) {
+    // Con sesión, el final de la intro ya es la pantalla de carga: esperamos aquí a que la app entre.
+  } else if (introSigned) {
+    renderCover("loading");
   } else {
     // La app aún no ha dicho nada (la nube tarda): enseñamos el inicio sin botón hasta que conteste.
     renderCover("loading", { still: true });
   }
+}
+
+// Quita las clases de estado de la intro (intro-mode, s-*) para que no afecten a otra portada.
+function resetCoverClasses(cover) {
+  cover.classList.remove("leaving", "intro-mode", ...[...cover.classList].filter((c) => c.startsWith("s-")));
 }
 
 const GOOGLE_LOGO = `<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;

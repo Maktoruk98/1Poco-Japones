@@ -489,6 +489,9 @@ body.covered { overflow: hidden; }
 .intro-line b { display: block; font-weight: 600; font-size: 36px; letter-spacing: .14em; }
 .intro-line span { display: block; font-family: "Zen Kaku Gothic New", system-ui, sans-serif; font-size: 12px; letter-spacing: .2em; color: #7d746a; margin-top: 4px; }
 .intro-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; }
+/* Final de la intro con sesión: los textos de la pantalla de carga, con su tipografía normal */
+.intro-title.intro-final { font-family: "Zen Kaku Gothic New", system-ui, sans-serif; font-weight: 400; font-size: 14px; line-height: 1.6; }
+.intro-final .ac-welcome { margin-top: 0; }
 .cover.s-line-1 [data-line="1"], .cover.s-line-2 [data-line="2"], .cover.s-line-3 [data-line="3"], .cover.s-title .intro-title { opacity: 1; transform: none; }
 .cover.s-line-1-out [data-line="1"], .cover.s-line-2-out [data-line="2"], .cover.s-line-3-out [data-line="3"] { opacity: 0; transform: translateY(-8px); }
 
