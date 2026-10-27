@@ -492,6 +492,7 @@ body.covered { overflow: hidden; }
 /* Final de la intro con sesión: los textos de la pantalla de carga, con su tipografía normal */
 .intro-title.intro-final { font-family: "Zen Kaku Gothic New", system-ui, sans-serif; font-weight: 400; font-size: 14px; line-height: 1.6; }
 .intro-final .ac-welcome { margin-top: 0; }
+.intro-tap { margin: 18px 0 0; font-size: 12px; letter-spacing: .22em; color: #7d746a; animation: ac-breathe 1.8s ease-in-out infinite; }
 .cover.s-line-1 [data-line="1"], .cover.s-line-2 [data-line="2"], .cover.s-line-3 [data-line="3"], .cover.s-title .intro-title { opacity: 1; transform: none; }
 .cover.s-line-1-out [data-line="1"], .cover.s-line-2-out [data-line="2"], .cover.s-line-3-out [data-line="3"] { opacity: 0; transform: translateY(-8px); }
 
@@ -548,3 +549,38 @@ body.covered { overflow: hidden; }
 }
 
 .version { text-align: center; font-size: .75rem; margin: 20px 0 0; }
+
+/* ---------- Aprender a leer ---------- */
+
+.small { font-size: .8rem; }
+.reads-options { display: grid; gap: 8px; }
+.reads-options .suggestion b { font-family: inherit; font-size: 1.05rem; }
+.read-hero .btn { margin-top: 4px; }
+.read-banner { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--ok-bg); display: grid; gap: 10px; }
+.lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.lesson { display: grid; gap: 2px; text-align: left; padding: 12px; min-width: 0; }
+.lesson b { font-size: 1.35rem; letter-spacing: .05em; overflow-wrap: anywhere; }
+.lesson span { font-size: .75rem; color: var(--muted); }
+.lesson small { font-size: .72rem; color: var(--accent); }
+.lesson.done { background: var(--ok-bg); border-color: var(--ok); }
+.lesson.done small { color: var(--ok); }
+.lesson.locked { opacity: .45; cursor: not-allowed; }
+.lesson-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; font-size: .85rem; }
+.link { border: 0; background: none; padding: 0; color: var(--accent); }
+.dots { display: flex; justify-content: center; gap: 6px; margin: 4px 0 10px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.dots i.seen { background: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.dots i.on { background: var(--accent); }
+.kana-intro { text-align: center; }
+.kana-big { font-family: "Shippori Mincho", "Zen Kaku Gothic New", serif; font-size: 7.5rem; line-height: 1.15; }
+.kana-sound { font-size: 2rem; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.kana-tip { background: var(--bg); border-radius: 12px; padding: 10px 12px; margin: 14px 0 0; text-align: left; font-size: .92rem; }
+.kana-example { margin-top: 16px; display: grid; gap: 2px; justify-items: center; }
+.kana-example .row { justify-content: center; }
+.kana-example b { font-size: 1.8rem; font-weight: 500; }
+.lesson-nav { display: flex; gap: 8px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.lesson-nav button { min-width: 130px; }
+.listen { font-size: 1.6rem; display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0; }
+.kana-options button { font-size: 2rem; }
+.lesson-done { text-align: center; }
+.lesson-done h2 { font-size: 1.1rem; text-transform: none; letter-spacing: 0; color: var(--ink); }

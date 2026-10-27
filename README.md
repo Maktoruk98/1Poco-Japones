@@ -14,6 +14,11 @@ Una app para aprender **un poco** de japonés cada día. Sin prisas, sin sesione
   estaciones. Hay 19 niveles, uno por estación: la primera es 弁天町 (Bentenchō, JR-O15) y,
   cada vez que subes de nivel, eliges la palabra que quieres dejar en la siguiente (entre
   las que más has practicado o una que escribas tú). La estación del día late suavemente.
+- **Leer** (読), para quien aún no conoce los símbolos: 20 lecciones por filas (10 de hiragana
+  y 10 de katakana). Cada una presenta los símbolos con su sonido, un consejo de pronunciación y
+  una palabra de ejemplo, y después se practica en los dos sentidos. La primera vez que entras,
+  la app pregunta si ya conoces los símbolos para enseñarte esta pestaña o las de Kana y
+  Palabras; se puede cambiar desde Progreso.
 - **Kana**: práctica de hiragana, katakana o ambos.
 - **Palabras**: vocabulario básico en las dos direcciones (japonés ⇄ español).
 - **Progreso**: qué kana y palabras dominas.
@@ -39,7 +44,7 @@ Cada vez que se abre, la app empieza con una intro de 12 segundos con melodía d
 música (se puede saltar; en el móvil empieza con «Toca para empezar», porque sin un toque el
 navegador no deja sonar audio). Un sol sale sobre el Fuji al amanecer y se convierte en el
 anillo de la Loop Line. Sin sesión, termina en el inicio de sesión con Google; con sesión,
-termina como pantalla de carga: tus estaciones, «おかえりなさい», la siguiente estación y un
+termina como pantalla de carga (unos segundos más, o toca para entrar): tus estaciones, «おかえりなさい», la siguiente estación y un
 proverbio japonés distinto cada día. Desde Progreso se puede volver a ver.
 
 Con Firebase configurado, cada persona inicia sesión con su cuenta de Google y tiene sus
@@ -60,6 +65,7 @@ la app funciona igual, solo en local. Para configurarlo:
 - `styles.css` — estilos (modo claro y oscuro)
 - `data.js` — contenido: kana, vocabulario y frases
 - `app.js` — lógica: rutas, cuestionarios, progreso
+- `learn.js` — aprender a leer: pregunta inicial, lecciones de kana, práctica y repaso
 - `line.js` — la Loop Line: estaciones, anillo, carteles, elección de palabra, romaji → hiragana y portada
 - `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube
 - `intro.mp3` — melodía de la intro (caja de música)

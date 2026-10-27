@@ -1,7 +1,7 @@
 // Primero intenta la red (para recibir siempre la última versión) y,
 // si no hay conexión, sirve la copia guardada.
-const CACHE = "upmj-v13";
-const FILES = ["./", "index.html", "styles.css", "data.js", "firebase-config.js", "line.js", "app.js", "cloud.js", "icon.svg", "manifest.webmanifest", "intro.mp3"];
+const CACHE = "upmj-v14";
+const FILES = ["./", "index.html", "styles.css", "data.js", "firebase-config.js", "line.js", "learn.js", "app.js", "cloud.js", "icon.svg", "manifest.webmanifest", "intro.mp3"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));

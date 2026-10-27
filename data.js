@@ -200,3 +200,61 @@ const PROVERBS = [
   ["猿も木から落ちる", "saru mo ki kara ochiru", "Hasta los monos se caen de los árboles."],
   ["花より団子", "hana yori dango", "Mejor dango que flores: lo práctico antes que lo bonito."],
 ].map(([jp, romaji, es]) => ({ jp, romaji, es }));
+
+// ---------- Aprender a leer ----------
+
+// Lecciones por filas, en el orden tradicional (あいうえお, かきくけこ…).
+const KANA_ROWS = [
+  ["a", "i", "u", "e", "o"],
+  ["ka", "ki", "ku", "ke", "ko"],
+  ["sa", "shi", "su", "se", "so"],
+  ["ta", "chi", "tsu", "te", "to"],
+  ["na", "ni", "nu", "ne", "no"],
+  ["ha", "hi", "fu", "he", "ho"],
+  ["ma", "mi", "mu", "me", "mo"],
+  ["ya", "yu", "yo"],
+  ["ra", "ri", "ru", "re", "ro"],
+  ["wa", "wo", "n"],
+];
+
+// Consejos de pronunciación, solo donde el sonido no es el obvio para alguien que habla español.
+const KANA_TIPS = {
+  a: "Las vocales japonesas suenan igual que en español. ¡Buena noticia!",
+  shi: "Suena «shi», como en inglés «she». Nunca «si».",
+  chi: "Suena «chi», como en «chico».",
+  tsu: "Suena «tsu», como en «tsunami»: una t y una s muy juntas.",
+  fu: "Entre «fu» y «ju»: se dice soplando suave, sin juntar los dientes con el labio.",
+  ha: "Como partícula (は) se lee «wa».",
+  he: "Como partícula (へ) se lee «e».",
+  ra: "La r japonesa es suave, entre nuestra «r» de «cara» y una «l».",
+  wo: "Suena «o». Solo se usa como partícula.",
+  n: "Es la única consonante que va sola. Suena como la «n» de «canción» o la «m» de «campo».",
+};
+
+// Una palabra de ejemplo por símbolo: [palabra, romaji, significado].
+const KANA_EXAMPLES = {
+  hiragana: {
+    a: ["あめ", "ame", "lluvia"], i: ["いぬ", "inu", "perro"], u: ["うみ", "umi", "mar"], e: ["えき", "eki", "estación"], o: ["おちゃ", "ocha", "té"],
+    ka: ["かさ", "kasa", "paraguas"], ki: ["き", "ki", "árbol"], ku: ["くも", "kumo", "nube"], ke: ["けいと", "keito", "lana"], ko: ["こども", "kodomo", "niño, niña"],
+    sa: ["さくら", "sakura", "cerezo"], shi: ["しお", "shio", "sal"], su: ["すし", "sushi", "sushi"], se: ["せんせい", "sensei", "profesor, profesora"], so: ["そら", "sora", "cielo"],
+    ta: ["たまご", "tamago", "huevo"], chi: ["ちず", "chizu", "mapa"], tsu: ["つき", "tsuki", "luna"], te: ["て", "te", "mano"], to: ["とり", "tori", "pájaro"],
+    na: ["なつ", "natsu", "verano"], ni: ["にく", "niku", "carne"], nu: ["ぬいぐるみ", "nuigurumi", "peluche"], ne: ["ねこ", "neko", "gato"], no: ["のり", "nori", "alga nori"],
+    ha: ["はな", "hana", "flor"], hi: ["ひと", "hito", "persona"], fu: ["ふね", "fune", "barco"], he: ["へや", "heya", "habitación"], ho: ["ほし", "hoshi", "estrella"],
+    ma: ["まど", "mado", "ventana"], mi: ["みず", "mizu", "agua"], mu: ["むし", "mushi", "insecto"], me: ["め", "me", "ojo"], mo: ["もり", "mori", "bosque"],
+    ya: ["やま", "yama", "montaña"], yu: ["ゆき", "yuki", "nieve"], yo: ["よる", "yoru", "noche"],
+    ra: ["らーめん", "rāmen", "ramen"], ri: ["りんご", "ringo", "manzana"], ru: ["るす", "rusu", "no estar en casa"], re: ["れきし", "rekishi", "historia"], ro: ["ろうそく", "rōsoku", "vela"],
+    wa: ["わたし", "watashi", "yo"], wo: ["ほんを よむ", "hon o yomu", "leer un libro (を va entre «libro» y «leer»)"], n: ["ほん", "hon", "libro (ん siempre va detrás)"],
+  },
+  katakana: {
+    a: ["アイス", "aisu", "helado"], i: ["イタリア", "Itaria", "Italia"], u: ["ウイスキー", "uisukī", "whisky"], e: ["エアコン", "eakon", "aire acondicionado"], o: ["オレンジ", "orenji", "naranja"],
+    ka: ["カメラ", "kamera", "cámara"], ki: ["キス", "kisu", "beso"], ku: ["クッキー", "kukkī", "galleta"], ke: ["ケーキ", "kēki", "pastel"], ko: ["コーヒー", "kōhī", "café"],
+    sa: ["サッカー", "sakkā", "fútbol"], shi: ["シーソー", "shīsō", "balancín"], su: ["スペイン", "Supein", "España"], se: ["セーター", "sētā", "jersey"], so: ["ソファ", "sofa", "sofá"],
+    ta: ["タクシー", "takushī", "taxi"], chi: ["チーズ", "chīzu", "queso"], tsu: ["ツアー", "tsuā", "tour"], te: ["テレビ", "terebi", "televisión"], to: ["トマト", "tomato", "tomate"],
+    na: ["ナイフ", "naifu", "cuchillo"], ni: ["ニュース", "nyūsu", "noticias"], nu: ["ヌードル", "nūdoru", "fideos"], ne: ["ネクタイ", "nekutai", "corbata"], no: ["ノート", "nōto", "cuaderno"],
+    ha: ["ハンバーガー", "hanbāgā", "hamburguesa"], hi: ["ヒーター", "hītā", "calefactor"], fu: ["フランス", "Furansu", "Francia"], he: ["ヘリコプター", "herikoputā", "helicóptero"], ho: ["ホテル", "hoteru", "hotel"],
+    ma: ["マスク", "masuku", "mascarilla"], mi: ["ミルク", "miruku", "leche"], mu: ["ムース", "mūsu", "mousse"], me: ["メロン", "meron", "melón"], mo: ["モデル", "moderu", "modelo"],
+    ya: ["ヤギ", "yagi", "cabra"], yu: ["ユニフォーム", "yunifōmu", "uniforme"], yo: ["ヨーグルト", "yōguruto", "yogur"],
+    ra: ["ラジオ", "rajio", "radio"], ri: ["リボン", "ribon", "lazo"], ru: ["ルール", "rūru", "regla"], re: ["レモン", "remon", "limón"], ro: ["ロボット", "robotto", "robot"],
+    wa: ["ワイン", "wain", "vino"], wo: ["ヲ", "wo", "casi no se usa: en su lugar se escribe を en hiragana"], n: ["パン", "pan", "pan (ン siempre va detrás)"],
+  },
+};

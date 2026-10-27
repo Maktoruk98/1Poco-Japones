@@ -524,7 +524,10 @@ function hideCover() {
     if (!document.getElementById("chooser")) document.body.classList.remove("covered");
     setTimeout(() => {
       cover.hidden = true;
-      if (pendingStops()) openChooser();
+      // La primera vez, preguntamos si ya conoce los símbolos; después, las estaciones pendientes.
+      const afterQuestion = () => pendingStops() && openChooser();
+      if (state.reads == null) openReadsQuestion(afterQuestion);
+      else afterQuestion();
     }, 450);
   }, wait);
 }
@@ -532,6 +535,7 @@ function hideCover() {
 // ---------- Intro (12 s, se puede saltar) ----------
 
 const INTRO_MS = 12000;
+const INTRO_SIGNED_MS = 17000; // con sesión, unos 7 s más para leer el final (o tocar para entrar antes)
 let introPlaying = false;
 let introDone = false; // tras la intro, la portada ya no repite sus animaciones de entrada
 let introSigned = false; // con sesión, la intro termina como pantalla de carga (tus estaciones, proverbio…)
@@ -575,6 +579,7 @@ function playIntro() {
          <div class="ac-rule"></div>
          <p class="ac-trip">Estación ${Math.min(stops.length, LOOP_STATIONS)} de ${LOOP_STATIONS} · siguiente: <b lang="ja">${nextJp}</b> ${nextEn}</p>
          <div class="ac-proverb"><b lang="ja">${p.jp}</b><span>${esc(p.romaji)} · «${esc(p.es.replace(/\.$/, ""))}»</span></div>
+         <p class="intro-tap">Toca para entrar</p>
        </div>`
     : `<h1 class="intro-title">Un poco más japonés</h1>`;
   cover.innerHTML = `
@@ -650,7 +655,11 @@ function startIntroTimeline(cover, intro, soundButton) {
       }, ms)
     )
   );
-  introTimers.push(setTimeout(endIntro, INTRO_MS));
+  introTimers.push(setTimeout(endIntro, introSigned ? INTRO_SIGNED_MS : INTRO_MS));
+  // Con sesión, en el final se puede tocar en cualquier parte para entrar sin esperar.
+  intro.addEventListener("click", (e) => {
+    if (introSigned && cover.classList.contains("s-title") && !e.target.closest("button")) endIntro();
+  });
 }
 
 // ---------- Melodía de la intro (caja de música, 8 s) ----------

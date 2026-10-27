@@ -1,7 +1,7 @@
 // Un poco más japonés — lógica de la app (sin dependencias).
 // La cuenta de Google y la sincronización en la nube viven en cloud.js.
 
-const APP_VERSION = "2026.10.27"; // se muestra al pie de Progreso para comprobar que la app está al día
+const APP_VERSION = "2026.10.27-b"; // se muestra al pie de Progreso para comprobar que la app está al día
 const DAILY_GOAL = 10;
 const MAX_BOX = 4;
 const BOX_WEIGHT = [8, 4, 2, 1, 0.5]; // lo que fallas aparece más a menudo
@@ -291,8 +291,12 @@ function renderHoy() {
       <p>${esc(phrase.es)}</p>
     </section>
     <div class="row">
-      <a class="btn primary" href="#kana">Practicar kana</a>
-      <a class="btn" href="#palabras">Practicar palabras</a>
+      ${
+        readingMode()
+          ? `<a class="btn primary" href="#leer">Aprender a leer</a>`
+          : `<a class="btn primary" href="#kana">Practicar kana</a>
+             <a class="btn" href="#palabras">Practicar palabras</a>`
+      }
     </div>`;
 
   const allItems = MOMENT_CATEGORIES.flatMap((c) => c.items);
@@ -441,6 +445,7 @@ function renderProgreso() {
 
   view.innerHTML = `
     ${typeof accountCard === "function" ? accountCard() : ""}
+    ${readingModeCard()}
     <section class="card">
       <h2>La intro</h2>
       <p class="muted">La intro con su melodía de caja de música sale al abrir la app sin sesión. Aquí puedes verla cuando quieras.</p>
@@ -463,6 +468,10 @@ function renderProgreso() {
     <p class="muted version">Versión ${APP_VERSION}</p>`;
 
   document.getElementById("replay-intro").addEventListener("click", replayIntro);
+  document.getElementById("switch-mode").addEventListener("click", () => {
+    setReadingMode(readingMode() ? "yes" : "no");
+    renderProgreso();
+  });
 
   document.getElementById("reset").addEventListener("click", () => {
     if (!confirm("¿Seguro que quieres borrar todo tu progreso?")) return;
@@ -474,15 +483,19 @@ function renderProgreso() {
 }
 
 function loadStateDefaults() {
-  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], line: [], updatedAt: 0 };
+  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], line: [], reads: null, updatedAt: 0 };
 }
 
 // ---------- Navegación ----------
 
-const ROUTES = { hoy: renderHoy, linea: renderLinea, kana: renderKana, palabras: renderPalabras, progreso: renderProgreso };
+const ROUTES = { hoy: renderHoy, linea: renderLinea, leer: renderLeer, kana: renderKana, palabras: renderPalabras, progreso: renderProgreso };
 
 function route() {
-  const name = location.hash.slice(1);
+  updateTabs();
+  let name = location.hash.slice(1);
+  // Cada modo tiene sus pestañas: quien aprende a leer va a «Leer» en vez de «Kana» o «Palabras», y al revés.
+  if (readingMode() && (name === "kana" || name === "palabras")) name = "leer";
+  if (!readingMode() && name === "leer") name = "kana";
   const tab = ROUTES[name] ? name : "hoy";
   document.querySelectorAll(".tabs a").forEach((a) => a.classList.toggle("on", a.dataset.tab === tab));
   ROUTES[tab]();
