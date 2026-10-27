@@ -372,7 +372,7 @@ body.covered { overflow: hidden; }
 /* Fondo: Fuji al amanecer, fijo y anclado abajo */
 .fuji { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .fuji-sky { transition: opacity 2.6s ease; }
-.fuji-land { transform: translateY(46px); transition: transform 2.8s cubic-bezier(.2, .7, .2, 1), opacity 2.4s ease; }
+.fuji-land { transform: translateY(46px); transition: transform 3.4s cubic-bezier(.2, .7, .2, 1), opacity 2.8s ease; }
 
 .ac {
   position: relative;
@@ -495,8 +495,8 @@ body.covered { overflow: hidden; }
 .intro-line .swap { position: relative; display: block; height: 1.3em; font-size: 36px; margin: 0; letter-spacing: 0; color: inherit; font-family: inherit; }
 .swap-a, .swap-b { position: absolute; left: 0; right: 0; top: 0; }
 .swap-b { font-size: 32px !important; letter-spacing: .04em !important; opacity: 0; }
-.cover.s-line-1 .swap-a { animation: swap-out .6s ease 1.3s forwards; }
-.cover.s-line-1 .swap-b { animation: swap-in .6s ease 1.3s forwards; }
+.cover.s-line-1 .swap-a { animation: swap-out .7s ease 2s forwards; }
+.cover.s-line-1 .swap-b { animation: swap-in .7s ease 2s forwards; }
 @keyframes swap-out { to { opacity: 0; } }
 @keyframes swap-in { to { opacity: 1; } }
 .intro-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; }

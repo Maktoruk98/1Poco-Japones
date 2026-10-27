@@ -534,8 +534,9 @@ function hideCover() {
 
 // ---------- Intro (12 s, se puede saltar) ----------
 
-const INTRO_MS = 13200;
-const INTRO_SIGNED_MS = 18200; // con sesión, unos 7 s más para leer el final (o tocar para entrar antes)
+// Sincronizada con la melodía (caja de música, 21 s): cada texto entra al empezar una frase musical.
+const INTRO_MS = 21000;
+const INTRO_SIGNED_MS = 24500; // con sesión, unos 7 s más para leer el final (o tocar para entrar antes)
 let introPlaying = false;
 let introDone = false; // tras la intro, la portada ya no repite sus animaciones de entrada
 let introSigned = false; // con sesión, la intro termina como pantalla de carga (tus estaciones, proverbio…)
@@ -544,8 +545,8 @@ let introTimers = [];
 
 // Cada paso: [momento en ms, qué hace]. Las escenas se encienden con la clase "on".
 const INTRO_STEPS = [
-  [200, "sun"], [700, "line-1"], [2300, "land"], [3200, "line-1-out"], [3600, "line-2"],
-  [6600, "line-2-out"], [6900, "ring"], [8100, "line-3"], [10100, "line-3-out"], [10900, "title"],
+  [200, "sun"], [800, "line-1"], [2000, "land"], [5400, "line-1-out"], [6300, "line-2"],
+  [11000, "line-2-out"], [11400, "ring"], [12600, "line-3"], [16400, "line-3-out"], [17200, "title"],
 ];
 
 // El sol de la intro viaja hasta Bentenchō y se convierte en su punto.
@@ -603,7 +604,7 @@ function playIntro() {
             <span class="swap"><b class="swap-a" lang="ja">少しずつ</b><b class="swap-b">poco a poco</b></span>
             <span>sukoshi zutsu</span>
           </p>
-          <p class="intro-line" data-line="2">Volviste a casa,<br>pero una parte de ti…<br>sigue esperando un tren en Osaka.</p>
+          <p class="intro-line" data-line="2">Volviste a casa,<br>pero una parte de ti...<br>sigue esperando un tren en Osaka.</p>
           <p class="intro-line" data-line="3">Un poco cada día,<br>un poco más japonés.</p>
           ${ending}
         </div>
@@ -667,7 +668,7 @@ function startIntroTimeline(cover, intro, soundButton) {
   });
 }
 
-// ---------- Melodía de la intro (caja de música, 8 s) ----------
+// ---------- Melodía de la intro (caja de música, 21 s) ----------
 
 let introMusic = null;
 
