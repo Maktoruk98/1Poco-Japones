@@ -441,6 +441,11 @@ function renderProgreso() {
   view.innerHTML = `
     ${typeof accountCard === "function" ? accountCard() : ""}
     <section class="card">
+      <h2>La intro</h2>
+      <p class="muted">La intro con su melodía de caja de música sale al abrir la app sin sesión. Aquí puedes verla cuando quieras.</p>
+      <button type="button" class="primary" id="replay-intro">▶ Ver la intro</button>
+    </section>
+    <section class="card">
       <h2>Resumen</h2>
       <p>🎌 Nivel <b>${levelFor(totalXp()).level}</b> · ${levelFor(totalXp()).jp} (${esc(levelFor(totalXp()).es)}) · ${totalXp()} pts</p>
       <p>🌸 Momentos japoneses apuntados: <b>${state.log.filter((m) => m.id !== "app-goal").length}</b></p>
@@ -454,6 +459,8 @@ function renderProgreso() {
     <section class="card"><h2>Hiragana</h2>${grid(hira)}</section>
     <section class="card"><h2>Katakana</h2>${grid(kata)}</section>
     <button id="reset">Borrar progreso</button>`;
+
+  document.getElementById("replay-intro").addEventListener("click", replayIntro);
 
   document.getElementById("reset").addEventListener("click", () => {
     if (!confirm("¿Seguro que quieres borrar todo tu progreso?")) return;

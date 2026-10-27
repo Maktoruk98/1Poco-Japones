@@ -549,11 +549,19 @@ function sunToBentencho() {
   return `--dx:${(x - RING.cx).toFixed(1)}px;--dy:${(y - RING.cy).toFixed(1)}px`;
 }
 
+// Volver a ver la intro desde la app. El toque en el botón ya cuenta como gesto, así que
+// la música suena sin pasar por «Toca para empezar»; al terminar, se vuelve a la app.
+function replayIntro() {
+  if (introPlaying) return;
+  if (playIntro()) introNext = "hide";
+}
+
 function playIntro() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   introPlaying = true;
   const cover = document.getElementById("cover");
   cover.hidden = false;
+  cover.classList.remove("leaving");
   document.body.classList.add("covered");
   cover.innerHTML = `
     ${fujiBackground()}
