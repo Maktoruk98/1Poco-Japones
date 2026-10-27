@@ -1,6 +1,6 @@
 // Primero intenta la red (para recibir siempre la última versión) y,
 // si no hay conexión, sirve la copia guardada.
-const CACHE = "upmj-v12";
+const CACHE = "upmj-v13";
 const FILES = ["./", "index.html", "styles.css", "data.js", "firebase-config.js", "line.js", "app.js", "cloud.js", "icon.svg", "manifest.webmanifest", "intro.mp3"];
 
 self.addEventListener("install", (e) => {
@@ -21,7 +21,8 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || (url.origin !== location.origin && !["www.gstatic.com", "fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname))) return;
   e.respondWith(
-    fetch(e.request)
+    // Nuestros archivos se piden sin caché HTTP, para que cada versión publicada llegue enseguida.
+    (url.origin === location.origin ? fetch(e.request.url, { cache: "no-cache" }) : fetch(e.request))
       .then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(e.request, copy));

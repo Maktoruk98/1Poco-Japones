@@ -1,6 +1,7 @@
 // Un poco más japonés — lógica de la app (sin dependencias).
 // La cuenta de Google y la sincronización en la nube viven en cloud.js.
 
+const APP_VERSION = "2026.10.27"; // se muestra al pie de Progreso para comprobar que la app está al día
 const DAILY_GOAL = 10;
 const MAX_BOX = 4;
 const BOX_WEIGHT = [8, 4, 2, 1, 0.5]; // lo que fallas aparece más a menudo
@@ -458,7 +459,8 @@ function renderProgreso() {
     </section>
     <section class="card"><h2>Hiragana</h2>${grid(hira)}</section>
     <section class="card"><h2>Katakana</h2>${grid(kata)}</section>
-    <button id="reset">Borrar progreso</button>`;
+    <button id="reset">Borrar progreso</button>
+    <p class="muted version">Versión ${APP_VERSION}</p>`;
 
   document.getElementById("replay-intro").addEventListener("click", replayIntro);
 

@@ -557,8 +557,8 @@ function replayIntro() {
   if (playIntro()) introNext = "hide";
 }
 
+// Se muestra siempre, también con «Reducir movimiento» (entonces solo con fundidos, ver styles.css).
 function playIntro() {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   introPlaying = true;
   introSigned = storeKey !== STORE_BASE;
   const cover = document.getElementById("cover");

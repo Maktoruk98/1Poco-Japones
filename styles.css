@@ -535,6 +535,16 @@ body.covered { overflow: hidden; }
 .later { justify-self: center; border: 0; background: none; color: var(--muted); }
 .line-pending { border-color: var(--loop); }
 
+/* Con «Reducir movimiento», la intro se mantiene pero solo con fundidos: nada se desplaza */
+@media (prefers-reduced-motion: reduce) {
+  .cover.intro-mode .fuji-land, .cover.s-land .fuji-land { transform: translateY(46px); }
+  .intro-line, .intro-title, .cover.s-line-1-out [data-line="1"], .cover.s-line-2-out [data-line="2"], .cover.s-line-3-out [data-line="3"] { transform: none !important; }
+  .intro-sun, .cover.s-sun .intro-sun, .cover.s-ring .intro-sun { transform: none !important; }
+  .cover.s-gate .intro-sun, .intro-gate { animation: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lr-ring.draw, .fade, .pop, .lr-beat, .lr-halo, .ac-title, .ac-welcome, .ac-sub, .ac-trip, .ac-proverb, .ac-depart, .ac-google, .ac-plain { animation: none !important; opacity: 1; stroke-dashoffset: 0; }
 }
+
+.version { text-align: center; font-size: .75rem; margin: 20px 0 0; }
