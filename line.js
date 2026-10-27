@@ -456,6 +456,23 @@ function proverbOfTheDay() {
   return PROVERBS[dayIndex() % PROVERBS.length];
 }
 
+// Textos del final con sesión. おかえりなさい y el proverbio se funden en su traducción;
+// la lectura (romaji) queda fija debajo.
+function welcomeBlock() {
+  const p = proverbOfTheDay();
+  return `
+    <h1 class="ac-welcome">
+      <span class="swap"><span class="swap-a" lang="ja">おかえりなさい</span><span class="swap-b">Bienvenido de vuelta</span></span>
+      <small>OKAERINASAI</small>
+    </h1>
+    <p class="ac-sub">Un poco de Japón, siempre contigo.</p>
+    <div class="ac-rule"></div>
+    <div class="ac-proverb">
+      <span class="swap"><b class="swap-a" lang="ja">${p.jp}</b><b class="swap-b">«${esc(p.es.replace(/\.$/, ""))}»</b></span>
+      <span class="pv-ro">${esc(p.romaji)}</span>
+    </div>`;
+}
+
 // mode: "loading" (abriendo la app) | "login" (falta iniciar sesión) | "offline" (sin nube)
 // still: sin animaciones de entrada (al llegar desde la intro, que ya ha dibujado el anillo)
 function renderCover(mode, { still = false } = {}) {
@@ -471,20 +488,13 @@ function renderCover(mode, { still = false } = {}) {
   document.body.classList.add("covered");
 
   if (signedIn) {
-    const stops = lineStops();
-    const [nextJp, nextEn] = stationName(stops.length + pendingStops());
-    const p = proverbOfTheDay();
     coverMinMs = Math.max(ringAnimationMs(), 4000); // tiempo para leer el proverbio
     cover.innerHTML = `
       ${fujiBackground()}
       <div class="ac">
-        <div class="ac-kicker"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
+        <div class="ac-kicker"><b lang="ja">大阪環状線</b> · TU PROPIA LOOP LINE</div>
         <div class="ac-ring">${ringSVG({ animate: true })}</div>
-        <h1 class="ac-welcome" lang="ja">おかえりなさい<small>OKAERINASAI</small></h1>
-        <p class="ac-sub">Ya estás de vuelta en tu pequeño Japón.</p>
-        <div class="ac-rule"></div>
-        <p class="ac-trip">Estación ${Math.min(stops.length, LOOP_STATIONS)} de ${LOOP_STATIONS} · siguiente: <b lang="ja">${nextJp}</b> ${nextEn}</p>
-        <div class="ac-proverb"><b lang="ja">${p.jp}</b><span>${esc(p.romaji)} · «${esc(p.es.replace(/\.$/, ""))}»</span></div>
+        <div class="ac-final">${welcomeBlock()}</div>
         <div class="ac-action"><p class="ac-depart"><b lang="ja">まもなく発車します</b>Salimos en un momento</p></div>
       </div>`;
     return;
@@ -494,7 +504,7 @@ function renderCover(mode, { still = false } = {}) {
   cover.innerHTML = `
     ${fujiBackground()}
     <div class="ac ${still ? "still" : ""}">
-      <div class="ac-kicker"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
+      <div class="ac-kicker"><b lang="ja">大阪環状線</b> · TU PROPIA LOOP LINE</div>
       <div class="ac-ring">${ringSVG({ mode: "login", animate: !still })}</div>
       <h1 class="ac-title">Un poco más japonés</h1>
       <div class="ac-rule"></div>
@@ -571,16 +581,9 @@ function playIntro() {
   resetCoverClasses(cover);
   cover.classList.add("intro-mode"); // antes de pintar: el Fuji empieza oculto, sin transición
   document.body.classList.add("covered");
-  const stops = lineStops();
-  const [nextJp, nextEn] = stationName(stops.length + pendingStops());
-  const p = proverbOfTheDay();
   const ending = introSigned
     ? `<div class="intro-title intro-final">
-         <h1 class="ac-welcome" lang="ja">おかえりなさい<small>OKAERINASAI</small></h1>
-         <p class="ac-sub">Ya estás de vuelta en tu pequeño Japón.</p>
-         <div class="ac-rule"></div>
-         <p class="ac-trip">Estación ${Math.min(stops.length, LOOP_STATIONS)} de ${LOOP_STATIONS} · siguiente: <b lang="ja">${nextJp}</b> ${nextEn}</p>
-         <div class="ac-proverb"><b lang="ja">${p.jp}</b><span>${esc(p.romaji)} · «${esc(p.es.replace(/\.$/, ""))}»</span></div>
+         ${welcomeBlock()}
          <p class="intro-tap">Toca para entrar</p>
        </div>`
     : `<h1 class="intro-title">Un poco más japonés</h1>`;
@@ -592,7 +595,7 @@ function playIntro() {
         <button type="button" class="intro-skip" data-skip>Saltar ›</button>
       </div>
       <div class="ac">
-        <div class="ac-kicker intro-late"><b lang="ja">大阪環状線</b> · OSAKA LOOP LINE</div>
+        <div class="ac-kicker intro-late"><b lang="ja">大阪環状線</b> · TU PROPIA LOOP LINE</div>
         <div class="ac-ring">
           <svg class="loop-ring" viewBox="0 0 360 360" aria-hidden="true">
             <circle class="intro-sun" cx="${RING.cx}" cy="${RING.cy}" r="16" style="${sunToBentencho()}"/>

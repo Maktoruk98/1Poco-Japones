@@ -397,9 +397,22 @@ body.covered { overflow: hidden; }
 .ac-sub { color: #5e564e; margin: 8px 0 0; font-size: 14px; line-height: 1.6; animation: ac-rise .8s .7s ease-out both; }
 .ac-trip { color: #5e564e; margin: 14px 0 0; font-size: 13px; animation: ac-rise .8s .9s ease-out both; }
 .ac-trip b { font-family: "Shippori Mincho", serif; font-weight: 600; color: #1d1b19; }
-.ac-proverb { margin-top: 18px; padding: 10px 16px; border-top: 1px solid rgba(29, 27, 25, .12); border-bottom: 1px solid rgba(29, 27, 25, .12); animation: ac-rise .8s 1.1s ease-out both; }
+.ac-proverb { margin-top: 22px; padding: 12px 16px; width: 100%; border-top: 1px solid rgba(29, 27, 25, .12); border-bottom: 1px solid rgba(29, 27, 25, .12); animation: ac-rise .8s 1.1s ease-out both; }
 .ac-proverb b { display: block; font-family: "Shippori Mincho", serif; font-weight: 600; font-size: 19px; letter-spacing: .12em; }
-.ac-proverb span { font-size: 12px; color: #5e564e; }
+
+/* Final con sesión: おかえりなさい y el proverbio se funden en su traducción; la lectura queda fija */
+.ac-welcome .swap { position: relative; display: block; height: 1.35em; }
+.ac-welcome .swap-b { font-size: 25px; letter-spacing: .02em; line-height: 1.4; }
+.ac-proverb .swap { position: relative; display: block; height: 46px; }
+.ac-proverb .swap-a { line-height: 46px; }
+.ac-proverb .swap-b { font-size: 15px; font-weight: 500; letter-spacing: .01em; line-height: 1.5; display: flex; align-items: center; justify-content: center; height: 46px; }
+.ac-proverb .pv-ro { display: block; font-size: 12px; color: #5e564e; letter-spacing: .06em; margin-top: 4px; }
+/* El fundido empieza al mostrarse el bloque: al pintarse (pantalla de carga) o al llegar el final de la intro */
+.ac-final .ac-welcome .swap-a, .cover.s-title .intro-final .ac-welcome .swap-a { animation: swap-out .7s ease 1.8s forwards; }
+.ac-final .ac-welcome .swap-b, .cover.s-title .intro-final .ac-welcome .swap-b { animation: swap-in .7s ease 1.8s forwards; }
+.ac-final .ac-proverb .swap-a, .cover.s-title .intro-final .ac-proverb .swap-a { animation: swap-out .7s ease 3.2s forwards; }
+.ac-final .ac-proverb .swap-b, .cover.s-title .intro-final .ac-proverb .swap-b { animation: swap-in .7s ease 3.2s forwards; }
+.ac-final { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .ac-action { margin-top: auto; padding-top: 26px; width: 100%; display: grid; gap: 10px; justify-items: center; }
 .ac-depart { margin: 0; font-size: 12px; letter-spacing: .14em; color: #7d746a; animation: ac-breathe 1.6s ease-in-out infinite; }
 .ac-depart b { font-family: "Shippori Mincho", serif; font-weight: 600; letter-spacing: .2em; color: #1d1b19; margin-right: 6px; }
@@ -494,9 +507,10 @@ body.covered { overflow: hidden; }
 /* 少しずつ → «poco a poco» en el mismo sitio; «sukoshi zutsu» fijo debajo */
 .intro-line .swap { position: relative; display: block; height: 1.3em; font-size: 36px; margin: 0; letter-spacing: 0; color: inherit; font-family: inherit; }
 .swap-a, .swap-b { position: absolute; left: 0; right: 0; top: 0; }
-.swap-b { font-size: 32px !important; letter-spacing: .04em !important; opacity: 0; }
-.cover.s-line-1 .swap-a { animation: swap-out .7s ease 2s forwards; }
-.cover.s-line-1 .swap-b { animation: swap-in .7s ease 2s forwards; }
+.swap-b { opacity: 0; }
+.intro-line .swap-b { font-size: 32px; letter-spacing: .04em; }
+.cover.s-line-1 [data-line="1"] .swap-a { animation: swap-out .7s ease 2s forwards; }
+.cover.s-line-1 [data-line="1"] .swap-b { animation: swap-in .7s ease 2s forwards; }
 @keyframes swap-out { to { opacity: 0; } }
 @keyframes swap-in { to { opacity: 1; } }
 .intro-title { font-family: "Shippori Mincho", serif; font-weight: 500; font-size: 30px; }
