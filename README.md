@@ -70,6 +70,7 @@ la app funciona igual, solo en local. Para configurarlo:
 - `line.js` — la Loop Line: estaciones, anillo, carteles, elección de palabra, romaji → hiragana y portada
 - `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube
 - `intro.mp3` — melodía de la intro (caja de música)
-- `icon-*.png`, `apple-touch-icon.png`, `favicon-48.png` — iconos (redondeado para el navegador y
-  Android; cuadrado a sangre para iPhone y los iconos adaptables de Android)
+- `icon-*.png`, `apple-touch-icon.png`, `favicon-48.png` — iconos: el emblema (sol, torii, cerezos y
+  学ぶ) sobre crema. Redondeado para el navegador y Android; cuadrado para iPhone y para los iconos
+  adaptables de Android, que redondean las esquinas por su cuenta
 - `sw.js`, `manifest.webmanifest` — soporte PWA/offline
