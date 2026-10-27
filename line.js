@@ -488,7 +488,7 @@ function renderCover(mode, { still = false } = {}) {
   document.body.classList.add("covered");
 
   if (signedIn) {
-    coverMinMs = Math.max(ringAnimationMs(), 4000); // tiempo para leer el proverbio
+    coverMinMs = state.skipIntro ? 300 : Math.max(ringAnimationMs(), 4000); // tiempo para leer el proverbio
     cover.innerHTML = `
       ${fujiBackground()}
       <div class="ac">
@@ -534,22 +534,59 @@ function hideCover() {
     if (!document.getElementById("chooser")) document.body.classList.remove("covered");
     setTimeout(() => {
       cover.hidden = true;
-      // La primera vez, preguntamos si ya conoce los símbolos; después, las estaciones pendientes.
-      const afterQuestion = () => pendingStops() && openChooser();
-      if (state.reads == null) openReadsQuestion(afterQuestion);
-      else afterQuestion();
+      // Preguntas pendientes, de una en una: si ya conoce los símbolos, si quiere saltarse la
+      // intro (tras verla 3 veces con sesión) y las estaciones por elegir.
+      const chooser = () => pendingStops() && openChooser();
+      const introQuestion = () =>
+        introCountedNow && state.introViews >= 3 && !state.introAsked && !state.skipIntro ? openIntroQuestion(chooser) : chooser();
+      if (state.reads == null) openReadsQuestion(introQuestion);
+      else introQuestion();
     }, 450);
   }, wait);
 }
 
-// ---------- Intro (12 s, se puede saltar) ----------
+// A la tercera intro con sesión: ¿quieres saltártela a partir de ahora?
+function openIntroQuestion(onDone) {
+  if (document.getElementById("intro-question")) return;
+  state.introAsked = true;
+  save();
+  const box = document.createElement("div");
+  box.id = "intro-question";
+  box.className = "chooser";
+  box.innerHTML = `
+    <div class="chooser-card" role="dialog" aria-modal="true" aria-labelledby="intro-q-title">
+      <p class="chooser-kicker">Ya la has visto 3 veces</p>
+      <h2 id="intro-q-title">¿Quieres saltarte la intro?</h2>
+      <p class="muted">Si quieres, a partir de ahora la app se abrirá directamente, sin la intro ni la música. Puedes volver a activarla cuando quieras desde Progreso.</p>
+      <div class="reads-options">
+        <button type="button" class="suggestion" data-skip-intro="yes"><b>Sí, entrar directamente</b><span>La app se abre sin intro.</span></button>
+        <button type="button" class="suggestion" data-skip-intro="no"><b>No, me gusta verla</b><span>Seguirá saliendo cada vez que abras la app.</span></button>
+      </div>
+    </div>`;
+  document.body.append(box);
+  document.body.classList.add("covered");
+  box.querySelectorAll("[data-skip-intro]").forEach((b) =>
+    b.addEventListener("click", () => {
+      state.skipIntro = b.dataset.skipIntro === "yes";
+      save();
+      box.remove();
+      if (document.getElementById("cover").hidden) document.body.classList.remove("covered");
+      if (state.skipIntro) toast("Hecho. Puedes volver a activarla en Progreso.");
+      if (location.hash === "#progreso") route();
+      onDone && onDone();
+    })
+  );
+}
+
+// ---------- Intro (se puede saltar) ----------
 
 // Sincronizada con la melodía (caja de música, 21 s): cada texto entra al empezar una frase musical.
 const INTRO_MS = 21000;
 const INTRO_SIGNED_MS = 24500; // con sesión, unos 7 s más para leer el final (o tocar para entrar antes)
 let introPlaying = false;
 let introDone = false; // tras la intro, la portada ya no repite sus animaciones de entrada
-let introSigned = false; // con sesión, la intro termina como pantalla de carga (tus estaciones, proverbio…)
+let introSigned = false;
+let introCountedNow = false; // en esta apertura se ha visto la intro con sesión // con sesión, la intro termina como pantalla de carga (tus estaciones, proverbio…)
 let introNext = null; // lo que pidió la app mientras sonaba la intro: "login", "offline", "loading" o "hide"
 let introTimers = [];
 
@@ -565,17 +602,17 @@ function sunToBentencho() {
   return `--dx:${(x - RING.cx).toFixed(1)}px;--dy:${(y - RING.cy).toFixed(1)}px`;
 }
 
-// Volver a ver la intro desde la app. El toque en el botón ya cuenta como gesto, así que
-// la música suena sin pasar por «Toca para empezar»; al terminar, se vuelve a la app.
-function replayIntro() {
-  if (introPlaying) return;
-  if (playIntro()) introNext = "hide";
-}
-
 // Se muestra siempre, también con «Reducir movimiento» (entonces solo con fundidos, ver styles.css).
 function playIntro() {
+  const signed = storeKey !== STORE_BASE;
+  if (signed && state.skipIntro) return false;
   introPlaying = true;
-  introSigned = storeKey !== STORE_BASE;
+  introSigned = signed;
+  if (signed) {
+    state.introViews = (state.introViews || 0) + 1;
+    introCountedNow = true;
+    save();
+  }
   const cover = document.getElementById("cover");
   cover.hidden = false;
   resetCoverClasses(cover);

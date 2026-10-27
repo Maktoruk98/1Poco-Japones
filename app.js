@@ -1,7 +1,7 @@
 // Un poco más japonés — lógica de la app (sin dependencias).
 // La cuenta de Google y la sincronización en la nube viven en cloud.js.
 
-const APP_VERSION = "2026.10.27-b"; // se muestra al pie de Progreso para comprobar que la app está al día
+const APP_VERSION = "2026.10.27-c"; // se muestra al pie de Progreso para comprobar que la app está al día
 const DAILY_GOAL = 10;
 const MAX_BOX = 4;
 const BOX_WEIGHT = [8, 4, 2, 1, 0.5]; // lo que fallas aparece más a menudo
@@ -447,9 +447,9 @@ function renderProgreso() {
     ${typeof accountCard === "function" ? accountCard() : ""}
     ${readingModeCard()}
     <section class="card">
-      <h2>La intro</h2>
-      <p class="muted">La intro con su melodía de caja de música sale al abrir la app sin sesión. Aquí puedes verla cuando quieras.</p>
-      <button type="button" class="primary" id="replay-intro">▶ Ver la intro</button>
+      <h2>Intro al abrir la app</h2>
+      <p class="muted">${state.skipIntro ? "Desactivada: la app se abre directamente, sin intro ni música." : "Activada: cada vez que abres la app, la intro con su melodía de caja de música."}</p>
+      <button type="button" id="toggle-intro" aria-pressed="${!state.skipIntro}">${state.skipIntro ? "Activar la intro" : "Desactivar la intro"}</button>
     </section>
     <section class="card">
       <h2>Resumen</h2>
@@ -467,7 +467,12 @@ function renderProgreso() {
     <button id="reset">Borrar progreso</button>
     <p class="muted version">Versión ${APP_VERSION}</p>`;
 
-  document.getElementById("replay-intro").addEventListener("click", replayIntro);
+  document.getElementById("toggle-intro").addEventListener("click", () => {
+    state.skipIntro = !state.skipIntro;
+    state.introAsked = true;
+    save();
+    renderProgreso();
+  });
   document.getElementById("switch-mode").addEventListener("click", () => {
     setReadingMode(readingMode() ? "yes" : "no");
     renderProgreso();
@@ -483,7 +488,7 @@ function renderProgreso() {
 }
 
 function loadStateDefaults() {
-  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], line: [], reads: null, updatedAt: 0 };
+  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], line: [], reads: null, introViews: 0, introAsked: false, skipIntro: false, updatedAt: 0 };
 }
 
 // ---------- Navegación ----------
@@ -505,8 +510,8 @@ function route() {
 window.addEventListener("hashchange", route);
 renderStreak();
 route();
-// Siempre que se abre la app: intro de 12 s con melodía. Sin sesión termina en el inicio de
-// sesión; con sesión termina como pantalla de carga. Con «reducir movimiento», solo la carga.
+// Al abrir la app: intro con melodía. Sin sesión termina en el inicio de sesión; con sesión
+// termina como pantalla de carga, salvo que se haya desactivado (entonces se entra directamente).
 if (!playIntro()) renderCover("loading");
 if (!FIREBASE_CONFIG) hideCover();
 
