@@ -168,6 +168,23 @@ textarea { resize: vertical; line-height: 1.5; }
 .rubrica button span { font-size: .8rem; color: var(--suave); }
 .rubrica button.sel { border-color: var(--acento); background: var(--acento-tenue); }
 
+/* Chat sobre la valoración */
+.chat { border-top: 1px solid var(--raya); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.chat-log { display: flex; flex-direction: column; gap: 10px; }
+.chat-log:empty { display: none; }
+.msg { max-width: min(100%, 60ch); display: flex; flex-direction: column; gap: 2px; }
+.msg p { white-space: pre-wrap; padding: 10px 12px; border-radius: 4px; background: var(--fondo); overflow-wrap: anywhere; }
+.msg.yo { align-self: flex-end; }
+.msg.yo p { background: var(--acento-tenue); }
+.msg .quien { font: 600 .7rem var(--dato); text-transform: uppercase; letter-spacing: .07em; color: var(--suave); }
+.msg.yo .quien { text-align: right; }
+.chips-acc { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn-chip { font: 600 .84rem var(--texto); color: var(--acento); background: transparent; border: 1px solid var(--acento); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.btn-chip:hover { background: var(--acento-tenue); }
+.chat .fila { align-items: flex-end; flex-wrap: nowrap; }
+.chat textarea { flex: 1; }
+.enlace { font: 600 .84rem var(--texto); color: var(--acento); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; white-space: nowrap; }
+
 /* Banco */
 .q { border-bottom: 1px solid var(--raya); }
 .q summary { display: flex; align-items: center; gap: 10px; padding: 11px 0; cursor: pointer; list-style: none; }

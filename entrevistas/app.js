@@ -641,6 +641,7 @@ function render() {
   document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("activa", a.getAttribute("href") === "#" + r));
   $("#vista").innerHTML = { inicio: vInicio, simulacro: vSimulacro, banco: vBanco, historias: vHistorias, preparar: vPreparar, progreso: vProgreso }[r]();
   if (r === "banco") pintarLista();
+  if (r === "simulacro" && ses && ses.fase === "feedback") pintarChat();
   if (r === "simulacro" && ses && ses.fase === "respondiendo") {
     pintarReloj();
     pintarMic();
@@ -832,7 +833,16 @@ function vFeedback(q, paso) {
     ${star}
     ${ia ? `<div class="dos-col">
       <div><h3>Lo que funciona</h3><ul class="puntos ok">${ia.fortalezas.map((x) => `<li>${e(x)}</li>`).join("")}</ul></div>
-      <div><h3>Qué cambiar</h3><ul class="puntos mejora">${ia.mejoras.map((x) => `<li>${e(x)}</li>`).join("")}</ul></div>
+      <div><h3>Qué cambiar</h3><ul class="puntos mejora">${ia.mejoras.map((x, i) => `<li>${e(x)} <button class="enlace" data-a="chat-mejora" data-i="${i}">Hablar de esto</button></li>`).join("")}</ul></div>
+    </div>
+    <div class="chat" id="chat">
+      <h3>Coméntalo con tu entrevistador</h3>
+      <p class="mini">Pregunta por cualquier punto de la valoración, pide ejemplos o prueba otra forma de decirlo.</p>
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <div class="chips-acc">${CHAT_SUGERENCIAS.map((t, i) => `<button class="btn-chip" data-a="chat-sug" data-i="${i}">${e(t)}</button>`).join("")}</div>
+      <div class="fila"><label class="oculto" for="chat-txt">Tu mensaje</label>
+        <textarea id="chat-txt" rows="2" placeholder="Escribe tu duda o tu nueva versión de la respuesta"></textarea>
+        <button class="btn primario" id="chat-btn" data-a="chat-enviar">Enviar</button></div>
     </div>` : ""}
     <h3>Análisis de la forma</h3>
     <ul class="puntos">${m.obs.map(([t, x]) => `<li class="${t}">${e(x)}</li>`).join("")}</ul>
@@ -844,6 +854,87 @@ function vFeedback(q, paso) {
     <div class="fila fin"><button class="btn" data-a="repetir">Repetir esta pregunta</button>
     <button class="btn primario" data-a="siguiente">${ses.i + 1 >= ses.cola.length ? "Ver informe" : ses.cola[ses.i + 1].esRepregunta ? "Siguiente: repregunta" : "Siguiente pregunta"}</button></div>
   </section>`;
+}
+
+// ----- Chat sobre la valoración
+
+const CHAT_SUGERENCIAS = ["¿Por qué esta nota?", "Dame un ejemplo de cómo decirlo", "Hazme preguntas para sacar mis datos", "¿Qué es lo primero que debo corregir?"];
+
+function contextoChat(q, fb) {
+  const ia = fb.ia;
+  return `Eres un preparador de entrevistas de trabajo. Acabas de valorar la respuesta de un candidato en un simulacro y ahora conversas con él para que entienda la valoración y aprenda a responder mejor.
+
+CONTEXTO DEL CANDIDATO
+${contextoPerfil()}
+
+PREGUNTA DE LA ENTREVISTA: ${q.q}
+${q.busca ? "LO QUE SE BUSCA: " + q.busca : ""}
+
+SU RESPUESTA:
+"""
+${fb.intento.resp.slice(0, 4000)}
+"""
+
+TU VALORACIÓN: nota ${ia.nota} de 10. ${ia.veredicto}
+Criterios: ${Object.entries(ia.criterios).map(([k, v]) => `${NOMBRE_CRIT[k]} ${v}`).join(", ")}.
+Lo que funciona: ${ia.fortalezas.join(" | ")}
+Qué cambiar: ${ia.mejoras.map((x, i) => `(${i + 1}) ${x}`).join(" | ")}
+Versión mejorada que propusiste: ${ia.version}
+
+CÓMO RESPONDER
+- En castellano, cercano y directo, como en una conversación. Máximo unas 130 palabras salvo que te pida más.
+- Práctico: explica el porqué y da frases de ejemplo que podría decir tal cual.
+- No inventes hechos de su experiencia. Si hace falta un dato suyo, pregúntaselo y construye con lo que te dé.
+- Si te envía una nueva versión de su respuesta, valórala brevemente frente a la anterior y di qué pulir.
+- Texto plano, sin markdown, sin asteriscos ni títulos. Puedes usar saltos de línea y guiones.
+- Céntrate en preparar entrevistas; si se desvía, reconduce con amabilidad.`;
+}
+
+function pintarChat() {
+  const log = $("#chat-log");
+  if (!log || !ses || !ses.fb) return;
+  const c = ses.fb.chat || [];
+  log.innerHTML = c.map((m) => `<div class="msg ${m.role === "user" ? "yo" : "ia"}"><span class="quien">${m.role === "user" ? "Tú" : "Entrevistador"}</span><p>${e(m.content) || '<span class="cargando">Pensando</span>'}</p></div>`).join("");
+  const b = $("#chat-btn");
+  if (b) b.disabled = !!ses.fb.chatOcupado;
+}
+
+async function chatEnviar(texto) {
+  const fb = ses && ses.fb;
+  texto = (texto || "").trim();
+  if (!fb || !fb.ia || !cap.sample || !texto || fb.chatOcupado) return;
+  fb.chat = fb.chat || [];
+  fb.chat.push({ role: "user", content: texto });
+  const resp = { role: "assistant", content: "" };
+  fb.chat.push(resp);
+  fb.chatOcupado = true;
+  pintarChat();
+  $("#chat-log")?.lastElementChild?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const previos = fb.chat.slice(0, -1).slice(-13);
+  if (previos[0].role !== "user") previos.shift();
+  const msgs = previos.map((m, i) => ({ role: m.role, content: i === 0 ? contextoChat(actual(), fb) + "\n\nMENSAJE DEL CANDIDATO: " + m.content : m.content }));
+  const vivo = () => ses && ses.fb === fb;
+  try {
+    const r = await cap.sample(msgs, {
+      cache: false,
+      onText: ({ text }) => {
+        if (!vivo()) return;
+        resp.content = text;
+        const p = $("#chat-log")?.lastElementChild?.querySelector("p");
+        if (p) p.textContent = text;
+      },
+    });
+    resp.content = (r && r.text) || resp.content;
+  } catch (err) {
+    if (err && err.text) resp.content = err.text;
+    else fb.chat.splice(-2, 2);
+    if (vivo()) {
+      aviso(mensajeIA(err));
+      if (!resp.content) { const t = $("#chat-txt"); if (t && !t.value) t.value = texto; }
+    }
+  }
+  fb.chatOcupado = false;
+  if (vivo()) pintarChat();
 }
 
 // ----- Banco
@@ -1168,6 +1259,18 @@ const A = {
     render();
   },
   auto: (el) => autoevaluar(Number(el.dataset.v)),
+  "chat-enviar": () => {
+    const t = $("#chat-txt");
+    const v = t.value;
+    if (!v.trim() || ses.fb.chatOcupado) return;
+    t.value = "";
+    chatEnviar(v);
+  },
+  "chat-sug": (el) => chatEnviar(CHAT_SUGERENCIAS[Number(el.dataset.i)]),
+  "chat-mejora": (el) => {
+    chatEnviar(`Quiero profundizar en este punto: «${ses.fb.ia.mejoras[Number(el.dataset.i)]}». Explícame por qué importa y cómo aplicarlo a mi respuesta, con un ejemplo.`);
+    $("#chat")?.scrollIntoView({ block: "start", behavior: "smooth" });
+  },
   nuevo: () => {
     ses = null;
     render();
@@ -1391,6 +1494,12 @@ function alCambiar(ev) {
   }
 }
 document.addEventListener("input", alCambiar);
+document.addEventListener("keydown", (ev) => {
+  if (ev.target.id === "chat-txt" && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) {
+    ev.preventDefault();
+    A["chat-enviar"]();
+  }
+});
 
 window.addEventListener("hashchange", () => {
   if (ses && ocupado() && ruta() !== "simulacro") {
