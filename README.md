@@ -74,3 +74,12 @@ la app funciona igual, solo en local. Para configurarlo:
   学ぶ) sobre crema. Redondeado para el navegador y Android; cuadrado para iPhone y para los iconos
   adaptables de Android, que redondean las esquinas por su cuenta
 - `sw.js`, `manifest.webmanifest` — soporte PWA/offline
+
+## Sala de Entrevistas (`entrevistas/`)
+
+Una app aparte, en la carpeta `entrevistas/`, para entrenar entrevistas de trabajo: simulacros
+cronometrados, banco de preguntas con lo que busca quien entrevista, historias STAR, preparación
+de una entrevista concreta (presentación, preguntas para hacer, salario, lista de comprobación) y
+progreso. Analiza cada respuesta (estructura STAR, cifras, muletillas, ritmo) y repite más lo que
+peor llevas. No comparte código ni datos con la app de japonés. Sin dependencias: se abre en
+`/entrevistas/`. Publicada como artefacto de Claude añade entrevistador con IA, dictado y voz.
