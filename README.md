@@ -77,7 +77,8 @@ la app funciona igual, solo en local. Para configurarlo:
 
 ## Sala de Entrevistas (`entrevistas/`)
 
-Una app aparte, en la carpeta `entrevistas/`, para entrenar entrevistas de trabajo: simulacros
+Una app aparte, en la carpeta `entrevistas/`, para entrenar entrevistas de trabajo: entrenamiento
+por escrito pregunta a pregunta (sin nota, con pistas de lo que busca quien entrevista), simulacros
 cronometrados, banco de preguntas con lo que busca quien entrevista, historias STAR, preparación
 de una entrevista concreta (presentación, preguntas para hacer, salario, lista de comprobación) y
 progreso. Analiza cada respuesta (estructura STAR, cifras, muletillas, ritmo) y repite más lo que

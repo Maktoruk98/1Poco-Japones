@@ -185,6 +185,17 @@ textarea { resize: vertical; line-height: 1.5; }
 .chat textarea { flex: 1; }
 .enlace { font: 600 .84rem var(--texto); color: var(--acento); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; white-space: nowrap; }
 
+/* Entrenamiento por escrito */
+.ent-grupo { border-bottom: 1px solid var(--raya); }
+.ent-grupo summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; cursor: pointer; }
+.ent-cat { display: flex; gap: 8px; align-items: center; font-weight: 700; }
+.ent-fila { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0 7px 22px; }
+.ent-fila input, .ent-cat input { accent-color: var(--acento); flex: none; margin-top: .35em; }
+.ent-cat input { margin-top: 0; }
+.ent-q { flex: 1; min-width: 0; font: inherit; color: var(--tinta); text-align: left; background: none; border: 0; padding: 0; cursor: pointer; }
+.ent-q:hover { color: var(--acento); text-decoration: underline; }
+#ent-txt { font-size: 1.05rem; line-height: 1.6; }
+
 /* Banco */
 .q { border-bottom: 1px solid var(--raya); }
 .q summary { display: flex; align-items: center; gap: 10px; padding: 11px 0; cursor: pointer; list-style: none; }
@@ -224,3 +235,7 @@ textarea { resize: vertical; line-height: 1.5; }
   .historia dd { margin-bottom: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+.ent-grupo summary { list-style: none; }
+.ent-grupo summary::-webkit-details-marker { display: none; }
+.ent-grupo summary .mini::after { content: "  ▸"; color: var(--acento); }
+.ent-grupo[open] summary .mini::after { content: "  ▾"; }

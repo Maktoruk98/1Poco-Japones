@@ -38,6 +38,7 @@ const DEF = () => ({
   check: {},
   dossier: null,
   dias: {},
+  entreno: { excl: [], resp: {}, ult: "" },
 });
 
 function leer(k) {
@@ -49,7 +50,7 @@ function leer(k) {
 }
 function fundir(base, extra) {
   const out = { ...base, ...(extra || {}) };
-  for (const k of ["perfil", "prefs", "salario"]) out[k] = { ...base[k], ...((extra || {})[k] || {}) };
+  for (const k of ["perfil", "prefs", "salario", "entreno"]) out[k] = { ...base[k], ...((extra || {})[k] || {}) };
   return out;
 }
 
@@ -629,8 +630,8 @@ function siguiente() {
 
 // ---------- Vistas ----------
 
-const ui = { banco: { cat: "", estado: "", txt: "" }, historia: null, pulido: null, confirmar: null, cargando: {} };
-const VISTAS = ["inicio", "simulacro", "banco", "historias", "preparar", "progreso"];
+const ui = { ent: { modo: "lista", cola: [], i: 0 }, banco: { cat: "", estado: "", txt: "" }, historia: null, pulido: null, confirmar: null, cargando: {} };
+const VISTAS = ["inicio", "entrenar", "simulacro", "banco", "historias", "preparar", "progreso"];
 const ruta = () => {
   const h = location.hash.slice(1);
   return VISTAS.includes(h) ? h : "inicio";
@@ -639,7 +640,7 @@ const ruta = () => {
 function render() {
   const r = ruta();
   document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("activa", a.getAttribute("href") === "#" + r));
-  $("#vista").innerHTML = { inicio: vInicio, simulacro: vSimulacro, banco: vBanco, historias: vHistorias, preparar: vPreparar, progreso: vProgreso }[r]();
+  $("#vista").innerHTML = { inicio: vInicio, entrenar: vEntrenar, simulacro: vSimulacro, banco: vBanco, historias: vHistorias, preparar: vPreparar, progreso: vProgreso }[r]();
   if (r === "banco") pintarLista();
   if (r === "simulacro" && ses && ses.fase === "feedback") pintarChat();
   if (r === "simulacro" && ses && ses.fase === "respondiendo") {
@@ -680,8 +681,8 @@ function vInicio() {
       <h1>Entrena hasta que la entrevista te resulte conocida.</h1>
       <p class="suave">${cap.sample ? "Tu entrevistador con IA puntúa cada respuesta, te repregunta y te propone una versión mejor." : "Cada respuesta se analiza al momento: estructura STAR, cifras, muletillas y ritmo."}</p>
       <div class="fila">
-        <button class="btn primario" data-a="rapido">Simulacro rápido · 3 preguntas</button>
-        <a class="btn" href="#simulacro">Configurar simulacro</a>
+        <a class="btn primario" href="#entrenar">Entrenar por escrito</a>
+        <button class="btn" data-a="rapido">Simulacro rápido · 3 preguntas</button>
       </div>
       <p class="mini">${racha() ? `Racha de ${racha()} ${racha() === 1 ? "día" : "días"} · ` : ""}${hoy} ${hoy === 1 ? "respuesta" : "respuestas"} hoy</p>
     </div>
@@ -699,12 +700,92 @@ function vInicio() {
       ${flojas.length
         ? `<ul class="lista-limpia">${flojas.map((x) => `<li><span>${e(COMPETENCIAS[x.c])}</span>${sello(x.media)}</li>`).join("")}</ul>
            <button class="btn" data-a="flojas">Entrenar lo que peor llevo</button>`
-        : `<ol class="pasos"><li>Indica el puesto en <a href="#preparar">Preparar</a>.</li><li>Haz un simulacro rápido.</li><li>Escribe tu primera <a href="#historias">historia STAR</a>.</li></ol>`}
+        : `<ol class="pasos"><li>Indica el puesto en <a href="#preparar">Preparar</a>.</li><li>Escribe tus respuestas con calma en <a href="#entrenar">Entrenar</a>.</li><li>Cuando tengas rodaje, haz un simulacro.</li><li>Escribe tu primera <a href="#historias">historia STAR</a>.</li></ol>`}
     </div>
   </section>
 
   ${pend.length ? `<section class="panel"><h2>Lo que más sube tu preparación</h2>
     <ul class="pendientes">${pend.map((x) => `<li><a href="${x[3]}"><span>${e(x[0])}</span><span class="mini">${e(x[4])} · hasta +${Math.round(x[1] * (1 - x[2]))} %</span></a></li>`).join("")}</ul></section>` : ""}`;
+}
+
+// ----- Entrenamiento por escrito
+
+const escrita = (id) => ((state.entreno.resp[id] || {}).txt || "").trim();
+const nPalabras = (t) => (t.trim() ? t.trim().split(/\s+/).length : 0);
+const textoCuenta = (t) => {
+  const n = nPalabras(t);
+  return `${n} ${n === 1 ? "palabra" : "palabras"}${n ? ` · unos ${Math.round(n / 2.5)} s si la dices en voz alta` : ""}`;
+};
+const elegidasEnt = () => todas().filter((q) => !state.entreno.excl.includes(q.id));
+
+function abrirEnt(cola, id) {
+  if (!cola.length) return aviso("No hay preguntas seleccionadas.");
+  ui.ent = { modo: "escribir", cola, i: Math.max(0, cola.indexOf(id)) };
+  if (location.hash !== "#entrenar") location.hash = "#entrenar";
+  else render();
+  window.scrollTo({ top: 0 });
+}
+
+function vEntrenar() {
+  if (ui.ent.modo === "escribir" && buscarQ(ui.ent.cola[ui.ent.i])) return vEscribir();
+  const all = todas();
+  const sel = elegidasEnt();
+  const hechas = sel.filter((q) => escrita(q.id)).length;
+  const ult = sel.find((q) => q.id === state.entreno.ult);
+  const grupos = Object.entries(CATEGORIAS).map(([k, v]) => [k, v, all.filter((q) => q.cat === k)]).filter((g) => g[2].length);
+  return `<section class="panel">
+    <p class="rotulo">Entrenamiento</p>
+    <h1>Escribe tus respuestas con calma, una a una</h1>
+    <p class="suave">Sin cronómetro, sin nota y sin críticas. Eliges las preguntas que te interesan, piensas qué quiere saber quien entrevista y redactas tu mejor respuesta. Todo queda guardado para repasarlo.</p>
+    <div>${barra(sel.length ? (hechas / sel.length) * 100 : 0, "gruesa")}</div>
+    <p class="mini">${hechas} de ${sel.length} preguntas seleccionadas ya tienen respuesta escrita.</p>
+    <div class="fila">
+      ${ult ? `<button class="btn primario" data-a="ent-seguir">Seguir donde lo dejé</button>` : ""}
+      <button class="btn ${ult ? "" : "primario"}" data-a="ent-empezar">${ult ? "Empezar desde la primera" : "Empezar"}</button>
+      ${hechas && hechas < sel.length ? `<button class="btn" data-a="ent-pendientes">Solo las que me faltan</button>` : ""}
+    </div>
+  </section>
+  <section class="panel">
+    <div class="fila entre"><h2>Elige tus preguntas</h2>
+      <div class="fila"><button class="btn fantasma" data-a="ent-todas">Marcar todas</button><button class="btn fantasma" data-a="ent-ninguna">Quitar todas</button></div></div>
+    ${grupos.map(([k, v, qs]) => {
+      const dentro = qs.filter((q) => !state.entreno.excl.includes(q.id)).length;
+      return `<details class="ent-grupo" ${dentro && dentro < qs.length || qs.some((q) => escrita(q.id)) || ui.ent.abiertos?.includes(k) ? "open" : ""} data-grupo="${k}">
+        <summary><label for="eg-${k}" class="ent-cat"><input type="checkbox" id="eg-${k}" data-excat="${k}" ${dentro ? "checked" : ""}> ${e(v)}</label><span class="mini">${dentro} de ${qs.length}</span></summary>
+        ${qs.map((q) => `<div class="ent-fila"><input type="checkbox" id="ex-${q.id}" data-ex="${q.id}" aria-label="Incluir esta pregunta" ${state.entreno.excl.includes(q.id) ? "" : "checked"}>
+          <button class="ent-q" data-a="ent-abrir" data-id="${q.id}">${e(q.q)}</button>
+          ${escrita(q.id) ? `<span class="sello bien">${nPalabras(escrita(q.id))} pal.</span>` : ""}</div>`).join("")}
+      </details>`;
+    }).join("")}
+  </section>`;
+}
+
+function vEscribir() {
+  const en = ui.ent;
+  const q = buscarQ(en.cola[en.i]);
+  const txt = (state.entreno.resp[q.id] || {}).txt || "";
+  const hs = state.historias.filter((h) => (h.comps || []).includes(q.comp));
+  const ultima = en.i + 1 >= en.cola.length;
+  return `<section class="tarjeta-pregunta">
+    <p class="rotulo">Entrenamiento · pregunta ${en.i + 1} de ${en.cola.length} · ${e(CATEGORIAS[q.cat])}</p>
+    <h1 class="pregunta">${e(q.q)}</h1>
+    <details class="pista">
+      <summary>Pista: qué busca el entrevistador</summary>
+      <p>${q.busca ? `En esta pregunta el entrevistador busca esto: <b>${e(q.busca.replace(/\.$/, ""))}</b>.` : "Antes de escribir, piensa qué quiere averiguar el entrevistador con esta pregunta y qué duda sobre ti intenta resolver."} Tenlo en cuenta y desarrolla un texto convincente.</p>
+      ${q.clave ? `<p><b>Cómo enfocarla:</b> ${e(q.clave)}</p>` : ""}
+      ${esConductual(q) ? `<p><b>Estructura que ayuda:</b> situación en dos frases, tu objetivo, lo que hiciste tú paso a paso y el resultado, con alguna cifra.</p>` : ""}
+      <p><b>Extensión orientativa:</b> entre 120 y 250 palabras, que dichas en voz alta son de uno a dos minutos.</p>
+      ${hs.length ? `<p><b>Tus historias que encajan:</b> ${hs.map((h) => e(h.titulo)).join(" · ")}</p>` : ""}
+    </details>
+    <label class="oculto" for="ent-txt">Tu respuesta</label>
+    <textarea id="ent-txt" rows="12" data-ent="${q.id}" placeholder="Escribe aquí tu respuesta, como si se la dijeras a quien te entrevista. Se guarda sola.">${e(txt)}</textarea>
+    <div class="fila entre"><span id="ent-cuenta" class="mini">${textoCuenta(txt)}</span><span id="ent-guardado" class="mini">${txt.trim() ? "Guardada" : ""}</span></div>
+    <div class="fila entre">
+      <div class="fila"><button class="btn fantasma" data-a="ent-lista">Lista de preguntas</button>
+      <button class="btn" data-a="ent-ir" data-d="-1" ${en.i ? "" : "disabled"}>Anterior</button></div>
+      <button class="btn primario" data-a="ent-ir" data-d="1">${ultima ? "Terminar" : "Siguiente pregunta"}</button>
+    </div>
+  </section>`;
 }
 
 // ----- Simulacro
@@ -728,6 +809,7 @@ function vSimulacro() {
       <details class="pista"><summary>Ver pista antes de responder</summary>
         <p><b>Qué buscan:</b> ${e(q.busca)}</p>${q.clave ? `<p><b>Cómo enfocarla:</b> ${e(q.clave)}</p>` : ""}
         ${hs.length ? `<p><b>Tus historias que encajan:</b> ${hs.map((h) => e(h.titulo)).join(" · ")}</p>` : ""}
+        ${escrita(q.id) ? `<p><b>Lo que escribiste en el entrenamiento:</b></p><p class="version">${e(escrita(q.id))}</p>` : ""}
       </details>
       <p class="mini">${ses.cfg.tiempo ? `Tiempo orientativo: ${mmss(ses.cfg.tiempo)}. ` : ""}Responde en voz alta aunque escribas después: es lo que harás el día de la entrevista.</p>
       <div class="fila fin"><button class="btn fantasma" data-a="saltar">Saltar</button><button class="btn fantasma" data-a="salir">Terminar simulacro</button></div>
@@ -982,7 +1064,9 @@ function pintarLista() {
         <p class="mini">${e(CATEGORIAS[q.cat])} · ${e(COMPETENCIAS[q.comp])} · ${ETIQUETA_ESTADO[est]}${s.n ? ` · ${s.n} ${s.n === 1 ? "intento" : "intentos"}, mejor nota ${num(s.best)}` : ""}</p>
         ${q.busca ? `<p><b>Qué buscan:</b> ${e(q.busca)}</p>` : ""}${q.clave ? `<p><b>Cómo enfocarla:</b> ${e(q.clave)}</p>` : ""}
         ${hs.length ? `<p><b>Tus historias que encajan:</b> ${hs.map((h) => e(h.titulo)).join(" · ")}</p>` : ""}
-        <div class="fila"><button class="btn primario" data-a="practicar" data-id="${q.id}">Practicar</button>
+        ${escrita(q.id) ? `<p><b>Tu respuesta escrita:</b></p><p class="version">${e(escrita(q.id))}</p>` : ""}
+        <div class="fila"><button class="btn primario" data-a="ent-abrir" data-id="${q.id}">${escrita(q.id) ? "Seguir escribiéndola" : "Escribirla con calma"}</button>
+        <button class="btn" data-a="practicar" data-id="${q.id}">Responder en simulacro</button>
         <button class="btn" data-a="fav" data-id="${q.id}">${state.favs.includes(q.id) ? "Quitar de favoritas" : "Marcar favorita"}</button>
         ${q.propia ? `<button class="btn fantasma" data-a="del-pregunta" data-id="${q.id}">Borrar</button>` : ""}</div>
       </div></details>`;
@@ -1259,6 +1343,26 @@ const A = {
     render();
   },
   auto: (el) => autoevaluar(Number(el.dataset.v)),
+  "ent-empezar": () => { const c = elegidasEnt().map((q) => q.id); abrirEnt(c, c[0]); },
+  "ent-seguir": () => abrirEnt(elegidasEnt().map((q) => q.id), state.entreno.ult),
+  "ent-pendientes": () => { const c = elegidasEnt().filter((q) => !escrita(q.id)).map((q) => q.id); abrirEnt(c, c[0]); },
+  "ent-abrir": (el) => {
+    const id = el.dataset.id;
+    state.entreno.excl = state.entreno.excl.filter((x) => x !== id);
+    abrirEnt(elegidasEnt().map((q) => q.id), id);
+  },
+  "ent-lista": () => { ui.ent.modo = "lista"; render(); },
+  "ent-ir": (el) => {
+    const i = ui.ent.i + Number(el.dataset.d);
+    if (i >= ui.ent.cola.length) {
+      ui.ent.modo = "lista";
+      aviso("Has llegado al final de tu selección.");
+    } else ui.ent.i = Math.max(0, i);
+    render();
+    window.scrollTo({ top: 0 });
+  },
+  "ent-todas": () => { state.entreno.excl = []; guardar(); render(); },
+  "ent-ninguna": () => { state.entreno.excl = todas().map((q) => q.id); guardar(); render(); },
   "chat-enviar": () => {
     const t = $("#chat-txt");
     const v = t.value;
@@ -1478,6 +1582,23 @@ function alCambiar(ev) {
   } else if (d.f) {
     ui.banco[d.f] = el.value;
     pintarLista();
+  } else if (d.ent) {
+    if (el.value.trim()) state.entreno.resp[d.ent] = { txt: el.value.slice(0, 4000), t: Date.now() };
+    else delete state.entreno.resp[d.ent];
+    state.entreno.ult = d.ent;
+    guardar();
+    $("#ent-cuenta").textContent = textoCuenta(el.value);
+    $("#ent-guardado").textContent = el.value.trim() ? "Guardada" : "";
+  } else if (d.ex || d.excat) {
+    const ids = d.ex ? [d.ex] : todas().filter((q) => q.cat === d.excat).map((q) => q.id);
+    const ex = new Set(state.entreno.excl);
+    ids.forEach((id) => (el.checked ? ex.delete(id) : ex.add(id)));
+    state.entreno.excl = [...ex];
+    ui.ent.abiertos = [...document.querySelectorAll(".ent-grupo[open]")].map((x) => x.dataset.grupo);
+    guardar();
+    const y = window.scrollY;
+    render();
+    window.scrollTo({ top: y });
   } else if (d.resp !== undefined) {
     ses.resp = el.value;
     pintarContador();
