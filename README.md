@@ -5,6 +5,12 @@ Una app para aprender **un poco** de japonés cada día. Sin prisas, sin sesione
 
 ## Qué incluye
 
+- **El paso de hoy** (今日の一歩), lo primero que ves: cada día, una pequeña propuesta para vivir
+  el día un poco más como en Japón («párate en algún lugar y busca algo de la naturaleza que delate
+  el paso de las estaciones»), con su palabra japonesa y lo que significa. Hay más de 70, algunas
+  solo en su estación del año. Si la de hoy no encaja, puedes pedir otra dos veces. Al hacerla sumas
+  puntos y puedes dejar una nota: con el tiempo forman tu cuaderno. Debajo, el periodo del calendario
+  tradicional japonés en el que estamos (立冬, «comienzo del invierno»…).
 - **Hoy**: tu nivel (de 観光客 «turista» a 日本の心 «corazón japonés») y los
   **momentos japoneses**: más de 30 hábitos y pequeños placeres que echa de menos quien
   vuelve de Japón (el bus puntual, guardarte la basura, decir いただきます…). Cada uno
@@ -66,6 +72,7 @@ la app funciona igual, solo en local. Para configurarlo:
 - `styles.css` — estilos (modo claro y oscuro)
 - `data.js` — contenido: kana, vocabulario y frases
 - `app.js` — lógica: rutas, cuestionarios, progreso
+- `steps.js` — el paso de hoy: las propuestas, cómo se elige la de cada día, el calendario y el cuaderno
 - `learn.js` — aprender a leer: pregunta inicial, lecciones de kana, práctica y repaso
 - `line.js` — la Loop Line: estaciones, anillo, carteles, elección de palabra, romaji → hiragana y portada
 - `cloud.js`, `firebase-config.js`, `firestore.rules` — cuentas de Google y nube

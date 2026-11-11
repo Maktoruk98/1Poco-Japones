@@ -1,7 +1,7 @@
 // Un poco más japonés — lógica de la app (sin dependencias).
 // La cuenta de Google y la sincronización en la nube viven en cloud.js.
 
-const APP_VERSION = "2026.10.27-f"; // se muestra al pie de Progreso para comprobar que la app está al día
+const APP_VERSION = "2026.11.11-a"; // se muestra al pie de Progreso para comprobar que la app está al día
 const DAILY_GOAL = 10;
 const MAX_BOX = 4;
 const BOX_WEIGHT = [8, 4, 2, 1, 0.5]; // lo que fallas aparece más a menudo
@@ -252,6 +252,7 @@ function renderHoy() {
   const customToday = today.filter((m) => m.id.startsWith("custom-"));
 
   view.innerHTML = `
+    ${stepCard()}
     ${levelCard()}
     ${lineHomeCard()}
     <section class="card">
@@ -298,6 +299,12 @@ function renderHoy() {
              <a class="btn" href="#palabras">Practicar palabras</a>`
       }
     </div>`;
+
+  bindStepCard(() => {
+    const y = window.scrollY;
+    renderHoy();
+    window.scrollTo(0, y);
+  });
 
   const allItems = MOMENT_CATEGORIES.flatMap((c) => c.items);
   view.querySelectorAll("[data-moment]").forEach((btn) =>
@@ -454,7 +461,8 @@ function renderProgreso() {
     <section class="card">
       <h2>Resumen</h2>
       <p>🎌 Nivel <b>${levelFor(totalXp()).level}</b> · ${levelFor(totalXp()).jp} (${esc(levelFor(totalXp()).es)}) · ${totalXp()} pts</p>
-      <p>🌸 Momentos japoneses apuntados: <b>${state.log.filter((m) => m.id !== "app-goal").length}</b></p>
+      <p>👣 Pasos dados: <b>${stepEntries().length}</b></p>
+      <p>🌸 Momentos japoneses apuntados: <b>${state.log.filter((m) => m.id !== "app-goal" && !m.id.startsWith("step-")).length}</b></p>
       <p>🔥 Racha: <b>${currentStreak()}</b> días</p>
       <p>🎯 Aciertos: <b>${correct}</b> de ${total}${total ? ` (${Math.round((correct / total) * 100)}%)` : ""}</p>
       <p>あ Hiragana dominado: <b>${mastered(hira)}</b>/${hira.length}</p>
@@ -488,7 +496,7 @@ function renderProgreso() {
 }
 
 function loadStateDefaults() {
-  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], line: [], reads: null, introViews: 0, introAsked: false, skipIntro: false, updatedAt: 0 };
+  return { boxes: {}, stats: { correct: 0, total: 0 }, today: { date: "", correct: 0 }, streak: { count: 0, last: "" }, log: [], step: { date: "", swaps: 0 }, line: [], reads: null, introViews: 0, introAsked: false, skipIntro: false, updatedAt: 0 };
 }
 
 // ---------- Navegación ----------

@@ -611,3 +611,24 @@ body.covered { overflow: hidden; }
 .kana-options button { font-size: 2rem; }
 .lesson-done { text-align: center; }
 .lesson-done h2 { font-size: 1.1rem; text-transform: none; letter-spacing: 0; color: var(--ink); }
+
+/* ---------- El paso de hoy ---------- */
+
+.step { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.step-kicker { margin: 0; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.step-title { font-family: "Shippori Mincho", serif; font-size: 1.6rem; line-height: 1.25; margin: 4px 0 10px; text-wrap: balance; }
+.step-text { margin: 0 0 14px; font-size: 1.05rem; line-height: 1.55; }
+.step-word { background: var(--bg); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+.step-word b { font-family: "Shippori Mincho", serif; font-size: 1.5rem; font-weight: 600; }
+.step-word p { margin: 6px 0 0; font-size: .92rem; line-height: 1.45; color: var(--muted); }
+.step-do { display: block; width: 100%; margin-bottom: 10px; }
+.step-last { margin: 0; }
+.step-ok { margin: 0; font-weight: 700; color: var(--ok); }
+.step.done { border-color: var(--ok); }
+.step.done .step-kicker { color: var(--ok); }
+.step .custom { margin: 10px 0 8px; }
+.step-sekki { margin: 14px 0 0; font-size: .85rem; }
+.step-log { margin-top: 12px; }
+.step-log summary { padding-bottom: 0; font-size: .95rem; }
+.step-log ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+.step-log li small { display: block; margin-top: 2px; color: var(--muted); font-size: .9rem; line-height: 1.4; }
