@@ -632,3 +632,9 @@ body.covered { overflow: hidden; }
 .step-log summary { padding-bottom: 0; font-size: .95rem; }
 .step-log ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
 .step-log li small { display: block; margin-top: 2px; color: var(--muted); font-size: .9rem; line-height: 1.4; }
+
+/* ---------- Voz ---------- */
+
+.voice-row { flex-wrap: nowrap; margin-bottom: 12px; }
+.voice-row select { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.voice-row button { flex: none; white-space: nowrap; }

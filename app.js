@@ -1,7 +1,7 @@
 // Un poco más japonés — lógica de la app (sin dependencias).
 // La cuenta de Google y la sincronización en la nube viven en cloud.js.
 
-const APP_VERSION = "2026.11.11-a"; // se muestra al pie de Progreso para comprobar que la app está al día
+const APP_VERSION = "2026.11.11-b"; // se muestra al pie de Progreso para comprobar que la app está al día
 const DAILY_GOAL = 10;
 const MAX_BOX = 4;
 const BOX_WEIGHT = [8, 4, 2, 1, 0.5]; // lo que fallas aparece más a menudo
@@ -173,13 +173,100 @@ function esc(s) {
 
 const canSpeak = "speechSynthesis" in window;
 
+// La voz la pone el dispositivo. Sin elegirla, el navegador usa la japonesa que tenga por
+// defecto, que a veces es una sintética antigua; por eso la app elige la mejor que encuentre
+// y deja cambiarla en Progreso. Se recuerda por dispositivo: cada uno tiene sus voces.
+const VOICE_KEY = "upmj:voice";
+const VOICE_SAMPLE = "こんにちは。し、ち、つ。しゃ、しゅ、しょ。";
+
+function japaneseVoices() {
+  if (!canSpeak) return [];
+  return speechSynthesis
+    .getVoices()
+    .filter((v) => /^ja([-_]|$)/i.test(v.lang))
+    .sort((a, b) => voiceScore(b) - voiceScore(a));
+}
+
+function voiceScore(v) {
+  let score = 0;
+  if (/premium|enhanced|mejorada|natural|neural|online|siri/i.test(v.name)) score += 30;
+  if (/google/i.test(v.name)) score += 20;
+  if (/kyoko|o-?ren|hattori|otoya/i.test(v.name)) score += 10;
+  // Voces sintéticas de estilo antiguo que Apple incluye en varios idiomas.
+  if (/^(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley)\b/i.test(v.name)) score -= 50;
+  if (/compact/i.test(v.voiceURI)) score -= 5;
+  return score;
+}
+
+function savedVoiceURI() {
+  try {
+    return localStorage.getItem(VOICE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function currentVoice() {
+  const voices = japaneseVoices();
+  return voices.find((v) => v.voiceURI === savedVoiceURI()) || voices[0] || null;
+}
+
 function speak(text) {
   if (!canSpeak) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
+  const voice = currentVoice();
+  if (voice) u.voice = voice;
   u.lang = "ja-JP";
   u.rate = 0.85;
   speechSynthesis.speak(u);
+}
+
+// Tarjeta de Progreso para ver, probar y elegir la voz.
+function voiceCard() {
+  if (!canSpeak) return "";
+  const voices = japaneseVoices();
+  const current = currentVoice();
+  const help = `<p class="muted small">En el iPhone puedes descargar voces mejores en Ajustes → Accesibilidad → Contenido leído → Voces → Japonés. Después vuelve aquí y, si aparece en la lista, elígela.</p>`;
+  if (!voices.length) {
+    return `
+      <section class="card">
+        <h2>Voz</h2>
+        <p>Este dispositivo no ofrece ninguna voz japonesa, así que el audio puede no sonar o sonar con una voz de otro idioma.</p>
+        ${help}
+      </section>`;
+  }
+  return `
+    <section class="card">
+      <h2>Voz</h2>
+      <p class="muted">La voz que oyes es la de tu dispositivo. Estas son las japonesas que ofrece; prueba cuál suena mejor.</p>
+      <div class="row voice-row">
+        <select id="voice" aria-label="Voz japonesa">
+          ${voices.map((v) => `<option value="${esc(v.voiceURI)}" ${v === current ? "selected" : ""}>${esc(v.name)}</option>`).join("")}
+        </select>
+        <button type="button" id="voice-test">🔊 Probar</button>
+      </div>
+      ${help}
+    </section>`;
+}
+
+function bindVoiceCard() {
+  const select = document.getElementById("voice");
+  if (!select) return;
+  select.addEventListener("change", () => {
+    try {
+      localStorage.setItem(VOICE_KEY, select.value);
+    } catch {}
+    speak(VOICE_SAMPLE);
+  });
+  document.getElementById("voice-test").addEventListener("click", () => speak(VOICE_SAMPLE));
+}
+
+// Algunos navegadores cargan la lista de voces un momento después de abrir la página.
+if (canSpeak && speechSynthesis.addEventListener) {
+  speechSynthesis.addEventListener("voiceschanged", () => {
+    if (location.hash === "#progreso" && !document.getElementById("voice")) route();
+  });
 }
 
 function speakButton(text) {
@@ -453,6 +540,7 @@ function renderProgreso() {
   view.innerHTML = `
     ${typeof accountCard === "function" ? accountCard() : ""}
     ${readingModeCard()}
+    ${voiceCard()}
     <section class="card">
       <h2>Intro al abrir la app</h2>
       <p class="muted">${state.skipIntro ? "Desactivada: la app se abre directamente, sin intro ni música." : "Activada: cada vez que abres la app, la intro con su melodía de caja de música."}</p>
@@ -481,6 +569,7 @@ function renderProgreso() {
     save();
     renderProgreso();
   });
+  bindVoiceCard();
   document.getElementById("switch-mode").addEventListener("click", () => {
     setReadingMode(readingMode() ? "yes" : "no");
     renderProgreso();
