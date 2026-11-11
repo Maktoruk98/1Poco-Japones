@@ -239,3 +239,5 @@ textarea { resize: vertical; line-height: 1.5; }
 .ent-grupo summary::-webkit-details-marker { display: none; }
 .ent-grupo summary .mini::after { content: "  ▸"; color: var(--acento); }
 .ent-grupo[open] summary .mini::after { content: "  ▾"; }
+.sello.escrita { color: var(--suave); }
+p.guion { display: block; }
